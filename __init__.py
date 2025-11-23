@@ -1,0 +1,4 @@
+"""
+Composite service package initializer.
+"""
+

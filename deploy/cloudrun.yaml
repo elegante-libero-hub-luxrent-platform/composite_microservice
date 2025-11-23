@@ -1,0 +1,20 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: composite
+spec:
+  template:
+    spec:
+      containers:
+      - image: gcr.io/PROJECT_ID/composite:latest
+        env:
+        - name: USER_SVC_BASE
+          value: https://user-svc.dev
+        - name: CAT_SVC_BASE
+          value: https://catalog-svc.dev
+        - name: ORD_SVC_BASE
+          value: https://order-svc.dev
+        - name: PORT
+          value: "8080"
+        - name: HTTP_TIMEOUT_SECONDS
+          value: "5"
