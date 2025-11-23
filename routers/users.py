@@ -3,11 +3,11 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Header, Response
 from httpx import AsyncClient
 
-from composite.config import Settings
-from composite.deps import get_http_client, get_settings_from_app
-from composite.error_model import http_error
-from composite.etag import strong_etag_bytes
-from composite.http import copy_headers, request_with_retry
+from config import Settings
+from deps import get_http_client, get_settings_from_app
+from error_model import http_error
+from etag import strong_etag_bytes
+from http_client import copy_headers, request_with_retry
 
 router = APIRouter(prefix="/users", tags=["users"])
 

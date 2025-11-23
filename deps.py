@@ -1,6 +1,6 @@
 from fastapi import Request
 
-from composite.config import Settings, get_settings
+from config import Settings, get_settings
 
 
 def get_http_client(request: Request):

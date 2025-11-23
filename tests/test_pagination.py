@@ -1,4 +1,4 @@
-from composite.pagination import (
+from pagination import (
     decode_token,
     encode_token,
     extract_tokens,

@@ -1,6 +1,6 @@
 import httpx
 
-from composite.pagination import decode_token
+from pagination import decode_token
 
 
 def test_user_etag_passthrough(client, respx_mock):

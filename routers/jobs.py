@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, Response
 from httpx import AsyncClient
 
-from composite.config import Settings
-from composite.deps import get_http_client, get_settings_from_app
-from composite.http import request_with_retry
+from config import Settings
+from deps import get_http_client, get_settings_from_app
+from http_client import request_with_retry
 
 router = APIRouter(tags=["jobs"])
 

@@ -4,11 +4,11 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Query, Response
 from httpx import AsyncClient
 
-from composite.config import Settings
-from composite.deps import get_http_client, get_settings_from_app
-from composite.etag import combined_etag, strong_etag_bytes
-from composite.http import request_with_retry
-from composite.pagination import extract_tokens, merge_tokens
+from config import Settings
+from deps import get_http_client, get_settings_from_app
+from etag import combined_etag, strong_etag_bytes
+from http_client import request_with_retry
+from pagination import extract_tokens, merge_tokens
 
 router = APIRouter(tags=["search"])
 

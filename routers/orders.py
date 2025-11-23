@@ -6,16 +6,16 @@ import time
 from fastapi import APIRouter, Depends, Response
 from httpx import AsyncClient, Response as HTTPXResponse
 
-from composite.config import Settings
-from composite.deps import get_http_client, get_settings_from_app
-from composite.error_model import http_error
-from composite.etag import combined_etag, strong_etag_bytes
-from composite.http import (
+from config import Settings
+from deps import get_http_client, get_settings_from_app
+from error_model import http_error
+from etag import combined_etag, strong_etag_bytes
+from http_client import (
     create_sync_client,
     request_with_retry,
     request_with_retry_sync,
 )
-from composite.models.order_models import OrderCreate
+from models.order_models import OrderCreate
 
 router = APIRouter(prefix="/orders", tags=["orders"])
 

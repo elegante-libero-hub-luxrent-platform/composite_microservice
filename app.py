@@ -3,10 +3,10 @@ import uuid
 
 from fastapi import FastAPI, Request
 
-from composite.aggregate import search
-from composite.config import get_settings
-from composite.http import create_async_client
-from composite.routers import health, items, jobs, orders, users
+from aggregate import search
+from config import get_settings
+from http_client import create_async_client
+from routers import health, items, jobs, orders, users
 
 
 @asynccontextmanager
