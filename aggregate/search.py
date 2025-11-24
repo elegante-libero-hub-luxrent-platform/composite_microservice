@@ -35,7 +35,7 @@ async def search(
         return await request_with_retry(
             client,
             "GET",
-            f"{settings.catalog_svc_base}/items",
+            f"{settings.catalog_svc_base}/catalog/items",
             params=params,
             retries=settings.http_retries,
         )

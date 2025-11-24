@@ -48,7 +48,7 @@ async def create_order(
     fanout_start = time.perf_counter()
     user_resp, item_resp = await asyncio.gather(
         _fetch_in_thread(f"{settings.user_svc_base}/users/{order.userId}", settings),
-        _fetch_in_thread(f"{settings.catalog_svc_base}/items/{order.itemId}", settings),
+        _fetch_in_thread(f"{settings.catalog_svc_base}/catalog/items/{order.itemId}", settings),
     )
     fanout_elapsed_ms = int((time.perf_counter() - fanout_start) * 1000)
 
@@ -63,16 +63,21 @@ async def create_order(
     user_resp.raise_for_status()
     item_resp.raise_for_status()
 
+    # Extract SKU from item response for availability check
+    item_data = item_resp.json()
+    item_sku = item_data.get("sku") or item_data.get("id")  # Fallback to id if sku not present
+
     availability_params = {
-        "startDate": order.startDate,
-        "endDate": order.endDate,
+        "sku": item_sku,
+        "start_date": order.startDate,
+        "end_date": order.endDate,
     }
     availability_params = {k: v for k, v in availability_params.items() if v}
 
     availability_resp = await request_with_retry(
         client,
         "GET",
-        f"{settings.catalog_svc_base}/items/{order.itemId}/availability",
+        f"{settings.catalog_svc_base}/availability",
         params=availability_params,
         retries=settings.http_retries,
     )

@@ -28,7 +28,7 @@ async def list_items(
     upstream = await request_with_retry(
         client,
         "GET",
-        f"{settings.catalog_svc_base}/items",
+        f"{settings.catalog_svc_base}/catalog/items",
         params=params,
         retries=settings.http_retries,
     )
@@ -53,7 +53,7 @@ async def get_item(
     upstream = await request_with_retry(
         client,
         "GET",
-        f"{settings.catalog_svc_base}/items/{item_id}",
+        f"{settings.catalog_svc_base}/catalog/items/{item_id}",
         retries=settings.http_retries,
     )
     if upstream.status_code == 404:
