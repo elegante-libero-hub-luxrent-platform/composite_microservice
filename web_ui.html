@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luxury Rental Platform - Composite Service Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .config-section {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .config-section input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .config-section label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #495057;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            background: #e9ecef;
+        }
+        
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 5px;
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .button:active {
+            transform: translateY(0);
+        }
+        
+        .button-secondary {
+            background: #6c757d;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .result-box {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 20px;
+            margin-top: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .result-box pre {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .header-info {
+            margin-top: 10px;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .parallel-info {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .fk-error {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .job-status {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        
+        .job-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .job-processing {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .job-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .job-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏛️ Luxury Rental Platform</h1>
+            <p>Composite Microservice Demo UI</p>
+            <div class="header-info">
+                Demonstrates: Encapsulation | Threads | FK Constraints | ETags | Pagination | 202 Async Jobs
+            </div>
+        </header>
+        
+        <div class="config-section">
+            <label for="baseUrl">Composite Service Base URL:</label>
+            <input type="text" id="baseUrl" value="http://localhost:8080" placeholder="https://your-service.run.app">
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('health')">Health</button>
+            <button class="tab" onclick="showTab('users')">Users</button>
+            <button class="tab" onclick="showTab('items')">Items</button>
+            <button class="tab" onclick="showTab('orders')">Orders</button>
+            <button class="tab" onclick="showTab('search')">Search</button>
+            <button class="tab" onclick="showTab('jobs')">Jobs</button>
+        </div>
+        
+        <!-- Health Tab -->
+        <div id="health" class="tab-content active">
+            <h2>Health Check</h2>
+            <button class="button" onclick="checkHealth()">Check Health</button>
+            <div id="healthResult" class="result-box" style="display:none;"></div>
+        </div>
+        
+        <!-- Users Tab -->
+        <div id="users" class="tab-content">
+            <h2>User Operations</h2>
+            <div class="form-group">
+                <label>User ID:</label>
+                <input type="text" id="userId" placeholder="Enter user ID (UUID format)">
+            </div>
+            <button class="button" onclick="getUser()">Get User</button>
+            <button class="button button-secondary" onclick="getUserWithETag()">Get User (ETag Test)</button>
+            <div id="userResult" class="result-box" style="display:none;"></div>
+        </div>
+        
+        <!-- Items Tab -->
+        <div id="items" class="tab-content">
+            <h2>Item Operations</h2>
+            <div class="form-group">
+                <label>Page Size:</label>
+                <input type="number" id="itemPageSize" value="5" min="1" max="100">
+            </div>
+            <div class="form-group">
+                <label>Page Token (optional):</label>
+                <input type="text" id="itemPageToken" placeholder="Leave empty for first page">
+            </div>
+            <button class="button" onclick="listItems()">List Items</button>
+            <div class="form-group" style="margin-top: 20px;">
+                <label>Item ID:</label>
+                <input type="text" id="itemId" placeholder="Enter item ID">
+            </div>
+            <button class="button" onclick="getItem()">Get Item</button>
+            <div id="itemResult" class="result-box" style="display:none;"></div>
+        </div>
+        
+        <!-- Orders Tab -->
+        <div id="orders" class="tab-content">
+            <h2>Order Operations</h2>
+            <div class="form-group">
+                <label>User ID:</label>
+                <input type="text" id="orderUserId" placeholder="Enter user ID">
+            </div>
+            <div class="form-group">
+                <label>Item ID:</label>
+                <input type="text" id="orderItemId" placeholder="Enter item ID">
+            </div>
+            <div class="form-group">
+                <label>Start Date:</label>
+                <input type="date" id="orderStartDate">
+            </div>
+            <div class="form-group">
+                <label>End Date:</label>
+                <input type="date" id="orderEndDate">
+            </div>
+            <button class="button" onclick="createOrder()">Create Order (Threads + FK)</button>
+            <button class="button button-secondary" onclick="testFKFailure()">Test FK Failure</button>
+            <div class="form-group" style="margin-top: 20px;">
+                <label>Order ID:</label>
+                <input type="text" id="orderId" placeholder="Enter order ID">
+            </div>
+            <button class="button" onclick="getOrder()">Get Order</button>
+            <div id="orderResult" class="result-box" style="display:none;"></div>
+        </div>
+        
+        <!-- Search Tab -->
+        <div id="search" class="tab-content">
+            <h2>Search (Merged Pagination)</h2>
+            <div class="form-group">
+                <label>Query:</label>
+                <input type="text" id="searchQuery" placeholder="Enter search query">
+            </div>
+            <div class="form-group">
+                <label>Page Size:</label>
+                <input type="number" id="searchPageSize" value="5" min="1" max="100">
+            </div>
+            <div class="form-group">
+                <label>Page Token (optional):</label>
+                <input type="text" id="searchPageToken" placeholder="Leave empty for first page">
+            </div>
+            <button class="button" onclick="search()">Search</button>
+            <div id="searchResult" class="result-box" style="display:none;"></div>
+        </div>
+        
+        <!-- Jobs Tab -->
+        <div id="jobs" class="tab-content">
+            <h2>Async Job Operations (202 Accepted)</h2>
+            <div class="form-group">
+                <label>Order ID to Confirm:</label>
+                <input type="text" id="confirmOrderId" placeholder="Enter order ID">
+            </div>
+            <button class="button" onclick="confirmOrder()">Confirm Order (202)</button>
+            <div class="form-group" style="margin-top: 20px;">
+                <label>Job ID:</label>
+                <input type="text" id="jobId" placeholder="Enter job ID from confirmation">
+            </div>
+            <button class="button" onclick="getJobStatus()">Get Job Status</button>
+            <button class="button button-secondary" onclick="pollJobStatus()">Poll Job Status</button>
+            <div id="jobResult" class="result-box" style="display:none;"></div>
+        </div>
+    </div>
+    
+    <script>
+        const baseUrl = () => document.getElementById('baseUrl').value || 'http://localhost:8080';
+        
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+        
+        function displayResult(elementId, data, headers = null) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            let html = '<pre>';
+            if (headers) {
+                html += '<strong>Response Headers:</strong>\n';
+                Object.entries(headers).forEach(([k, v]) => {
+                    html += `${k}: ${v}\n`;
+                });
+                html += '\n';
+            }
+            html += JSON.stringify(data, null, 2);
+            html += '</pre>';
+            element.innerHTML = html;
+        }
+        
+        async function checkHealth() {
+            try {
+                const response = await fetch(`${baseUrl()}/healthz`);
+                const data = await response.json();
+                displayResult('healthResult', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    data: data
+                });
+            } catch (error) {
+                displayResult('healthResult', { error: error.message });
+            }
+        }
+        
+        async function getUser() {
+            const userId = document.getElementById('userId').value;
+            if (!userId) {
+                alert('Please enter a user ID');
+                return;
+            }
+            try {
+                const response = await fetch(`${baseUrl()}/users/${userId}`);
+                const data = await response.json();
+                const etag = response.headers.get('etag');
+                displayResult('userResult', {
+                    status: response.status,
+                    etag: etag,
+                    data: data
+                }, { 'ETag': etag || 'N/A' });
+            } catch (error) {
+                displayResult('userResult', { error: error.message });
+            }
+        }
+        
+        async function getUserWithETag() {
+            const userId = document.getElementById('userId').value;
+            if (!userId) {
+                alert('Please enter a user ID');
+                return;
+            }
+            try {
+                // First request
+                const response1 = await fetch(`${baseUrl()}/users/${userId}`);
+                const etag1 = response1.headers.get('etag');
+                const data1 = await response1.json();
+                
+                // Second request with If-None-Match
+                const response2 = await fetch(`${baseUrl()}/users/${userId}`, {
+                    headers: { 'If-None-Match': etag1 }
+                });
+                
+                displayResult('userResult', {
+                    firstRequest: {
+                        status: response1.status,
+                        etag: etag1,
+                        data: data1
+                    },
+                    secondRequest: {
+                        status: response2.status,
+                        statusText: response2.statusText,
+                        cached: response2.status === 304
+                    }
+                });
+            } catch (error) {
+                displayResult('userResult', { error: error.message });
+            }
+        }
+        
+        async function listItems() {
+            const pageSize = document.getElementById('itemPageSize').value;
+            const pageToken = document.getElementById('itemPageToken').value;
+            let url = `${baseUrl()}/items?pageSize=${pageSize}`;
+            if (pageToken) url += `&pageToken=${encodeURIComponent(pageToken)}`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                displayResult('itemResult', {
+                    status: response.status,
+                    nextPageToken: data.nextPageToken,
+                    itemCount: data.items?.length || 0,
+                    data: data
+                });
+            } catch (error) {
+                displayResult('itemResult', { error: error.message });
+            }
+        }
+        
+        async function getItem() {
+            const itemId = document.getElementById('itemId').value;
+            if (!itemId) {
+                alert('Please enter an item ID');
+                return;
+            }
+            try {
+                const response = await fetch(`${baseUrl()}/items/${itemId}`);
+                const data = await response.json();
+                displayResult('itemResult', {
+                    status: response.status,
+                    data: data
+                });
+            } catch (error) {
+                displayResult('itemResult', { error: error.message });
+            }
+        }
+        
+        async function createOrder() {
+            const userId = document.getElementById('orderUserId').value;
+            const itemId = document.getElementById('orderItemId').value;
+            const startDate = document.getElementById('orderStartDate').value;
+            const endDate = document.getElementById('orderEndDate').value;
+            
+            if (!userId || !itemId || !startDate || !endDate) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            try {
+                const startTime = performance.now();
+                const response = await fetch(`${baseUrl()}/orders`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, itemId, startDate, endDate })
+                });
+                const elapsed = Math.round(performance.now() - startTime);
+                const data = await response.json();
+                
+                const headers = {
+                    'Location': response.headers.get('location'),
+                    'ETag': response.headers.get('etag'),
+                    'X-Composite-Threaded': response.headers.get('x-composite-threaded'),
+                    'X-Composite-Parallel-Ms': response.headers.get('x-composite-parallel-ms'),
+                    'X-Composite-Fanout': response.headers.get('x-composite-fanout')
+                };
+                
+                let result = {
+                    status: response.status,
+                    statusText: response.statusText,
+                    elapsedMs: elapsed,
+                    headers: headers,
+                    data: data
+                };
+                
+                if (response.status === 201) {
+                    result.parallelInfo = '✅ Order created using parallel threads!';
+                } else if (response.status === 422) {
+                    result.fkError = '❌ FK Validation Failed: ' + (data.detail?.message || 'Unknown error');
+                }
+                
+                displayResult('orderResult', result, headers);
+            } catch (error) {
+                displayResult('orderResult', { error: error.message });
+            }
+        }
+        
+        async function testFKFailure() {
+            try {
+                const response = await fetch(`${baseUrl()}/orders`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: 'non-existent-user',
+                        itemId: 'non-existent-item',
+                        startDate: '2025-12-01',
+                        endDate: '2025-12-05'
+                    })
+                });
+                const data = await response.json();
+                displayResult('orderResult', {
+                    status: response.status,
+                    fkValidation: 'FK constraint enforced!',
+                    error: data.detail
+                });
+            } catch (error) {
+                displayResult('orderResult', { error: error.message });
+            }
+        }
+        
+        async function getOrder() {
+            const orderId = document.getElementById('orderId').value;
+            if (!orderId) {
+                alert('Please enter an order ID');
+                return;
+            }
+            try {
+                const response = await fetch(`${baseUrl()}/orders/${orderId}`);
+                const data = await response.json();
+                displayResult('orderResult', {
+                    status: response.status,
+                    data: data
+                });
+            } catch (error) {
+                displayResult('orderResult', { error: error.message });
+            }
+        }
+        
+        async function search() {
+            const query = document.getElementById('searchQuery').value;
+            const pageSize = document.getElementById('searchPageSize').value;
+            const pageToken = document.getElementById('searchPageToken').value;
+            
+            if (!query) {
+                alert('Please enter a search query');
+                return;
+            }
+            
+            let url = `${baseUrl()}/search?q=${encodeURIComponent(query)}&pageSize=${pageSize}`;
+            if (pageToken) url += `&pageToken=${encodeURIComponent(pageToken)}`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                displayResult('searchResult', {
+                    status: response.status,
+                    resultCount: data.results?.length || 0,
+                    nextPageToken: data.nextPageToken,
+                    data: data
+                });
+            } catch (error) {
+                displayResult('searchResult', { error: error.message });
+            }
+        }
+        
+        async function confirmOrder() {
+            const orderId = document.getElementById('confirmOrderId').value;
+            if (!orderId) {
+                alert('Please enter an order ID');
+                return;
+            }
+            try {
+                const response = await fetch(`${baseUrl()}/orders/${orderId}/confirm`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                const location = response.headers.get('location');
+                
+                displayResult('jobResult', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    location: location,
+                    jobId: location ? location.split('/').pop() : 'N/A',
+                    message: response.status === 202 ? '✅ 202 Accepted - Job created' : 'Unexpected status',
+                    data: data
+                });
+                
+                if (location) {
+                    document.getElementById('jobId').value = location.split('/').pop();
+                }
+            } catch (error) {
+                displayResult('jobResult', { error: error.message });
+            }
+        }
+        
+        async function getJobStatus() {
+            const jobId = document.getElementById('jobId').value;
+            if (!jobId) {
+                alert('Please enter a job ID');
+                return;
+            }
+            try {
+                const response = await fetch(`${baseUrl()}/jobs/${jobId}`);
+                const data = await response.json();
+                displayResult('jobResult', {
+                    status: response.status,
+                    jobStatus: data.status,
+                    data: data
+                });
+            } catch (error) {
+                displayResult('jobResult', { error: error.message });
+            }
+        }
+        
+        async function pollJobStatus() {
+            const jobId = document.getElementById('jobId').value;
+            if (!jobId) {
+                alert('Please enter a job ID');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('jobResult');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div class="loading"></div> Polling job status...';
+            
+            const maxAttempts = 10;
+            let attempts = 0;
+            
+            const poll = setInterval(async () => {
+                attempts++;
+                try {
+                    const response = await fetch(`${baseUrl()}/jobs/${jobId}`);
+                    const data = await response.json();
+                    const status = data.status;
+                    
+                    let statusClass = 'job-pending';
+                    if (status === 'processing') statusClass = 'job-processing';
+                    else if (status === 'completed') statusClass = 'job-completed';
+                    else if (status === 'failed') statusClass = 'job-failed';
+                    
+                    resultDiv.innerHTML = `
+                        <div class="job-status ${statusClass}">Status: ${status.toUpperCase()}</div>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                        <p>Polling attempt: ${attempts}/${maxAttempts}</p>
+                    `;
+                    
+                    if (status === 'completed' || status === 'failed' || attempts >= maxAttempts) {
+                        clearInterval(poll);
+                    }
+                } catch (error) {
+                    resultDiv.innerHTML = `<pre>Error: ${error.message}</pre>`;
+                    clearInterval(poll);
+                }
+            }, 2000);
+        }
+        
+        // Set default dates
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const nextWeek = new Date(today);
+            nextWeek.setDate(nextWeek.getDate() + 7);
+            
+            document.getElementById('orderStartDate').value = tomorrow.toISOString().split('T')[0];
+            document.getElementById('orderEndDate').value = nextWeek.toISOString().split('T')[0];
+        });
+    </script>
+</body>
+</html>
+
