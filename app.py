@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 import uuid
 
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 
 from aggregate import search
 from config import get_settings
@@ -23,6 +24,13 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Composite Service", lifespan=lifespan)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"], 
+)
 
 @app.middleware("http")
 async def add_trace_id(request: Request, call_next):
