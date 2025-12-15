@@ -63,11 +63,13 @@ async def search(
         if orders_resp.status_code < 500:
             orders_resp.raise_for_status()
             orders_body = orders_resp.json()
-            merged = [{"source": "order", **order} for order in orders_body.get("orders", [])]
+            # Handle order service response - it can return array directly or object with orders key
+            orders_list = orders_body if isinstance(orders_body, list) else orders_body.get("orders", [])
+            merged = [{"source": "order", **order} for order in orders_list]
             merged = merged[:size]
             return {
                 "results": merged,
-                "nextPageToken": merge_tokens({"orders": orders_body.get("nextPageToken")}),
+                "nextPageToken": merge_tokens({"orders": orders_body.get("nextPageToken") if isinstance(orders_body, dict) else None}),
                 "pageSize": size,
                 "warning": "Catalog service unavailable, showing orders only"
             }
@@ -87,14 +89,17 @@ async def search(
     merged = []
     for item in items_body.get("items", []):
         merged.append({"source": "catalog", **item})
-    for order in orders_body.get("orders", []):
+    
+    # Handle order service response - it can return array directly or object with orders key
+    orders_list = orders_body if isinstance(orders_body, list) else orders_body.get("orders", [])
+    for order in orders_list:
         merged.append({"source": "order", **order})
 
     merged = merged[:size]
     next_token = merge_tokens(
         {
             "items": items_body.get("nextPageToken"),
-            "orders": orders_body.get("nextPageToken"),
+            "orders": orders_body.get("nextPageToken") if isinstance(orders_body, dict) else None,
         }
     )
 
