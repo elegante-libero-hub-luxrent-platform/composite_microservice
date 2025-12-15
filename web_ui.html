@@ -3,741 +3,1116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Luxury Rental Platform - Composite Service Demo</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Luxury Rental Platform - Complete API UI</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+        * { box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            max-width: 1400px; 
+            margin: 0 auto; 
             padding: 20px;
+            background: #f5f5f5;
         }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+        h1 { color: #333; text-align: center; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab { 
+            padding: 12px 24px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .tab.active { background: #4CAF50; color: white; }
+        .tab:not(.active) { background: #ddd; }
+        .panel { display: none; }
+        .panel.active { display: block; }
+        .card {
             background: white;
             border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
-        
-        header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-        
-        header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-        
-        header p {
-            opacity: 0.9;
-            font-size: 1.1em;
-        }
-        
-        .config-section {
             padding: 20px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        
-        .config-section input {
+        .card h3 { margin-top: 0; color: #333; font-size: 16px; }
+        .method { 
+            display: inline-block; 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            font-size: 12px; 
+            font-weight: bold; 
+            margin-right: 10px;
+        }
+        .method.GET { background: #61affe; color: white; }
+        .method.POST { background: #49cc90; color: white; }
+        .method.PUT { background: #fca130; color: white; }
+        .method.DELETE { background: #f93e3e; color: white; }
+        .method.PATCH { background: #50e3c2; color: white; }
+        input, textarea, select {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ced4da;
+            margin: 5px 0 15px 0;
+            border: 1px solid #ddd;
             border-radius: 6px;
-            font-size: 14px;
-            margin-top: 5px;
+            font-family: monospace;
+            font-size: 13px;
         }
-        
-        .config-section label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #495057;
-        }
-        
-        .tabs {
-            display: flex;
-            background: #f8f9fa;
-            border-bottom: 2px solid #dee2e6;
-        }
-        
-        .tab {
-            flex: 1;
-            padding: 15px 20px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            color: #6c757d;
-            transition: all 0.3s;
-        }
-        
-        .tab:hover {
-            background: #e9ecef;
-        }
-        
-        .tab.active {
-            background: white;
-            color: #667eea;
-            border-bottom: 3px solid #667eea;
-        }
-        
-        .tab-content {
-            display: none;
-            padding: 30px;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        .button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        textarea { min-height: 100px; resize: vertical; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        button.call {
+            background: #4CAF50;
             color: white;
             border: none;
             padding: 12px 24px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin: 5px;
-        }
-        
-        .button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-        
-        .button:active {
-            transform: translateY(0);
-        }
-        
-        .button-secondary {
-            background: #6c757d;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #495057;
-        }
-        
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ced4da;
-            border-radius: 6px;
             font-size: 14px;
+            width: 100%;
         }
-        
-        .result-box {
+        button.call:hover { background: #45a049; }
+        .result {
             background: #f8f9fa;
-            border: 1px solid #dee2e6;
+            border: 1px solid #e9ecef;
             border-radius: 6px;
-            padding: 20px;
-            margin-top: 20px;
-            max-height: 500px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 400px;
             overflow-y: auto;
         }
-        
-        .result-box pre {
-            margin: 0;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-left: 10px;
-        }
-        
-        .status-success {
-            background: #d4edda;
-            color: #155724;
-        }
-        
-        .status-error {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        
-        .status-info {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-        
-        .header-info {
-            margin-top: 10px;
-            font-size: 12px;
-            opacity: 0.8;
-        }
-        
-        .parallel-info {
-            background: #e7f3ff;
-            border-left: 4px solid #667eea;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 4px;
-        }
-        
-        .fk-error {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 4px;
-        }
-        
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-left: 10px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .job-status {
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 6px;
-            font-weight: 600;
-        }
-        
-        .job-pending {
-            background: #fff3cd;
-            color: #856404;
-        }
-        
-        .job-processing {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-        
-        .job-completed {
-            background: #d4edda;
-            color: #155724;
-        }
-        
-        .job-failed {
-            background: #f8d7da;
-            color: #721c24;
-        }
+        .result.success { border-color: #28a745; background: #d4edda; }
+        .result.error { border-color: #dc3545; background: #f8d7da; }
+        label { font-weight: 600; color: #555; font-size: 13px; display: block; margin-bottom: 5px; }
+        .endpoint-path { color: #666; font-size: 12px; font-family: monospace; margin-left: 10px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🏛️ Luxury Rental Platform</h1>
-            <p>Composite Microservice Demo UI</p>
-            <div class="header-info">
-                Demonstrates: Encapsulation | Threads | FK Constraints | ETags | Pagination | 202 Async Jobs
+    <h1>🏠 Luxury Rental Platform - Complete API Testing UI</h1>
+    
+    <div class="tabs">
+        <button class="tab active" onclick="showTab('catalog')">Catalog Service</button>
+        <button class="tab" onclick="showTab('order')">Order Service</button>
+        <button class="tab" onclick="showTab('user')">User Service</button>
+        <button class="tab" onclick="showTab('composite')">Composite Service</button>
+    </div>
+
+    <!-- CATALOG SERVICE -->
+    <div id="catalog" class="panel active">
+        <div class="card">
+            <h3><span class="method GET">GET</span> List Catalog Items<span class="endpoint-path">/catalog/items</span></h3>
+            <div class="form-row">
+                <div>
+                    <label>Page Size:</label>
+                    <input type="number" id="cat-list-size" value="5" min="1" max="100">
+                </div>
+                <div>
+                    <label>Next Page Token:</label>
+                    <input type="text" id="cat-list-token" placeholder="Optional">
+                </div>
             </div>
-        </header>
-        
-        <div class="config-section">
-            <label for="baseUrl">Composite Service Base URL:</label>
-            <input type="text" id="baseUrl" value="http://localhost:8080" placeholder="https://your-service.run.app">
+            <div class="form-row">
+                <div>
+                    <label>Category:</label>
+                    <input type="text" id="cat-list-category" placeholder="Optional">
+                </div>
+                <div>
+                    <label>Brand:</label>
+                    <input type="text" id="cat-list-brand" placeholder="Optional">
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Min Price (cents):</label>
+                    <input type="number" id="cat-list-minprice" placeholder="Optional">
+                </div>
+                <div>
+                    <label>Max Price (cents):</label>
+                    <input type="number" id="cat-list-maxprice" placeholder="Optional">
+                </div>
+            </div>
+            <button class="call" onclick="catalogList()">Call Endpoint</button>
+            <div id="cat-list-result" class="result"></div>
         </div>
-        
-        <div class="tabs">
-            <button class="tab active" onclick="showTab('health')">Health</button>
-            <button class="tab" onclick="showTab('users')">User & Profile</button>
-            <button class="tab" onclick="showTab('items')">Catalog & Inventory</button>
-            <button class="tab" onclick="showTab('orders')">Order & Rental</button>
-            <button class="tab" onclick="showTab('search')">Search</button>
-            <button class="tab" onclick="showTab('jobs')">Jobs</button>
+
+        <div class="card">
+            <h3><span class="method GET">GET</span> Get Catalog Item<span class="endpoint-path">/catalog/items/{id}</span></h3>
+            <label>Item ID:</label>
+            <input type="text" id="cat-get-id" placeholder="e.g., it-abc12345">
+            <button class="call" onclick="catalogGet()">Call Endpoint</button>
+            <div id="cat-get-result" class="result"></div>
         </div>
-        
-        <!-- Health Tab -->
-        <div id="health" class="tab-content active">
-            <h2>Health Check</h2>
-            <button class="button" onclick="checkHealth()">Check Health</button>
-            <div id="healthResult" class="result-box" style="display:none;"></div>
+
+        <div class="card">
+            <h3><span class="method POST">POST</span> Create Catalog Item<span class="endpoint-path">/catalog/items</span></h3>
+            <label>JSON Body:</label>
+            <textarea id="cat-create-body">{
+  "sku": "ITEM-" + Date.now(),
+  "name": "Luxury Watch",
+  "brand": "Rolex",
+  "category": "Watches",
+  "rent_price_cents": 5000,
+  "deposit_cents": 20000,
+  "description": "A beautiful luxury watch",
+  "photos": [],
+  "attrs": {}
+}</textarea>
+            <button class="call" onclick="catalogCreate()">Call Endpoint</button>
+            <div id="cat-create-result" class="result"></div>
         </div>
-        
-        <!-- User & Profile Service Tab -->
-        <div id="users" class="tab-content">
-            <h2>User & Profile Service</h2>
-            <div class="form-group">
-                <label>User ID:</label>
-                <input type="text" id="userId" placeholder="Enter user ID (UUID format)">
-            </div>
-            <button class="button" onclick="getUser()">Get User</button>
-            <button class="button button-secondary" onclick="getUserWithETag()">Get User (ETag Test)</button>
-            <div id="userResult" class="result-box" style="display:none;"></div>
+
+        <div class="card">
+            <h3><span class="method PUT">PUT</span> Update Catalog Item<span class="endpoint-path">/catalog/items/{id}</span></h3>
+            <label>Item ID:</label>
+            <input type="text" id="cat-update-id" placeholder="e.g., it-abc12345">
+            <label>JSON Body:</label>
+            <textarea id="cat-update-body">{
+  "name": "Updated Name",
+  "brand": "Updated Brand",
+  "category": "Updated Category",
+  "rent_price_cents": 6000,
+  "deposit_cents": 25000
+}</textarea>
+            <button class="call" onclick="catalogUpdate()">Call Endpoint</button>
+            <div id="cat-update-result" class="result"></div>
         </div>
-        
-        <!-- Catalog & Inventory Service Tab -->
-        <div id="items" class="tab-content">
-            <h2>Catalog & Inventory Service</h2>
-            <div class="form-group">
-                <label>Page Size:</label>
-                <input type="number" id="itemPageSize" value="5" min="1" max="100">
-            </div>
-            <div class="form-group">
-                <label>Page Token (optional):</label>
-                <input type="text" id="itemPageToken" placeholder="Leave empty for first page">
-            </div>
-            <button class="button" onclick="listItems()">List Items</button>
-            <div class="form-group" style="margin-top: 20px;">
-                <label>Item ID:</label>
-                <input type="text" id="itemId" placeholder="Enter item ID">
-            </div>
-            <button class="button" onclick="getItem()">Get Item</button>
-            <div id="itemResult" class="result-box" style="display:none;"></div>
-        </div>
-        
-        <!-- Order & Rental Service Tab -->
-        <div id="orders" class="tab-content">
-            <h2>Order & Rental Service</h2>
-            <div class="form-group">
-                <label>User ID:</label>
-                <input type="text" id="orderUserId" placeholder="Enter user ID">
-            </div>
-            <div class="form-group">
-                <label>Item ID:</label>
-                <input type="text" id="orderItemId" placeholder="Enter item ID">
-            </div>
-            <div class="form-group">
-                <label>Start Date:</label>
-                <input type="date" id="orderStartDate">
-            </div>
-            <div class="form-group">
-                <label>End Date:</label>
-                <input type="date" id="orderEndDate">
-            </div>
-            <button class="button" onclick="createOrder()">Create Order (Threads + FK)</button>
-            <button class="button button-secondary" onclick="testFKFailure()">Test FK Failure</button>
-            <div class="form-group" style="margin-top: 20px;">
-                <label>Order ID:</label>
-                <input type="text" id="orderId" placeholder="Enter order ID">
-            </div>
-            <button class="button" onclick="getOrder()">Get Order</button>
-            <div id="orderResult" class="result-box" style="display:none;"></div>
-        </div>
-        
-        <!-- Search Tab -->
-        <div id="search" class="tab-content">
-            <h2>Search (Merged Pagination)</h2>
-            <div class="form-group">
-                <label>Query:</label>
-                <input type="text" id="searchQuery" placeholder="Enter search query">
-            </div>
-            <div class="form-group">
-                <label>Page Size:</label>
-                <input type="number" id="searchPageSize" value="5" min="1" max="100">
-            </div>
-            <div class="form-group">
-                <label>Page Token (optional):</label>
-                <input type="text" id="searchPageToken" placeholder="Leave empty for first page">
-            </div>
-            <button class="button" onclick="search()">Search</button>
-            <div id="searchResult" class="result-box" style="display:none;"></div>
-        </div>
-        
-        <!-- Jobs Tab -->
-        <div id="jobs" class="tab-content">
-            <h2>Async Job Operations (202 Accepted)</h2>
-            <div class="form-group">
-                <label>Order ID to Confirm:</label>
-                <input type="text" id="confirmOrderId" placeholder="Enter order ID">
-            </div>
-            <button class="button" onclick="confirmOrder()">Confirm Order (202)</button>
-            <div class="form-group" style="margin-top: 20px;">
-                <label>Job ID:</label>
-                <input type="text" id="jobId" placeholder="Enter job ID from confirmation">
-            </div>
-            <button class="button" onclick="getJobStatus()">Get Job Status</button>
-            <button class="button button-secondary" onclick="pollJobStatus()">Poll Job Status</button>
-            <div id="jobResult" class="result-box" style="display:none;"></div>
+
+        <div class="card">
+            <h3><span class="method DELETE">DELETE</span> Delete Catalog Item<span class="endpoint-path">/catalog/items/{id}</span></h3>
+            <label>Item ID:</label>
+            <input type="text" id="cat-delete-id" placeholder="e.g., it-abc12345">
+            <button class="call" onclick="catalogDelete()">Call Endpoint</button>
+            <div id="cat-delete-result" class="result"></div>
         </div>
     </div>
-    
+
+    <!-- ORDER SERVICE -->
+    <div id="order" class="panel">
+        <div class="card">
+            <h3><span class="method GET">GET</span> List Orders<span class="endpoint-path">/orders</span></h3>
+            <div class="form-row">
+                <div>
+                    <label>Status (state):</label>
+                    <select id="order-list-status">
+                        <option value="">All</option>
+                        <option value="pending">Pending</option>
+                        <option value="active">Active</option>
+                        <option value="cancelled">Cancelled</option>
+                        <option value="returned">Returned</option>
+                    </select>
+                </div>
+                <div>
+                    <label>User ID:</label>
+                    <input type="number" id="order-list-userid" placeholder="Optional">
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Item ID:</label>
+                    <input type="number" id="order-list-itemid" placeholder="Optional">
+                </div>
+                <div>
+                    <label>From Date:</label>
+                    <input type="datetime-local" id="order-list-from" placeholder="Optional">
+                </div>
+            </div>
+            <div>
+                <label>To Date:</label>
+                <input type="datetime-local" id="order-list-to" placeholder="Optional">
+            </div>
+            <button class="call" onclick="orderList()">Call Endpoint</button>
+            <div id="order-list-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method GET">GET</span> Get Order<span class="endpoint-path">/orders/{orderId}</span></h3>
+            <label>Order ID:</label>
+            <input type="number" id="order-get-id" placeholder="e.g., 1">
+            <button class="call" onclick="orderGet()">Call Endpoint</button>
+            <div id="order-get-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method POST">POST</span> Create Order<span class="endpoint-path">/orders</span></h3>
+            <label>JSON Body:</label>
+            <textarea id="order-create-body">{
+  "user_id": 1,
+  "item_id": 1,
+  "start_date": "2025-01-01",
+  "end_date": "2025-01-07"
+}</textarea>
+            <button class="call" onclick="orderCreate()">Call Endpoint</button>
+            <div id="order-create-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method DELETE">DELETE</span> Cancel Order<span class="endpoint-path">/orders/{orderId}</span></h3>
+            <label>Order ID:</label>
+            <input type="number" id="order-cancel-id" placeholder="e.g., 1">
+            <button class="call" onclick="orderCancel()">Call Endpoint</button>
+            <div id="order-cancel-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method PATCH">PATCH</span> Update Order Status<span class="endpoint-path">/orders/{orderId}/status</span></h3>
+            <label>Order ID:</label>
+            <input type="number" id="order-status-id" placeholder="e.g., 1">
+            <label>JSON Body:</label>
+            <textarea id="order-status-body">{
+  "new_status": "active"
+}</textarea>
+            <small>Valid statuses: pending, active, cancelled, returned</small>
+            <button class="call" onclick="orderUpdateStatus()">Call Endpoint</button>
+            <div id="order-status-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method GET">GET</span> Get Order Logs<span class="endpoint-path">/orders/{orderId}/logs</span></h3>
+            <label>Order ID:</label>
+            <input type="number" id="order-logs-id" placeholder="e.g., 1">
+            <button class="call" onclick="orderGetLogs()">Call Endpoint</button>
+            <div id="order-logs-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method POST">POST</span> Confirm Order (202 Accepted)<span class="endpoint-path">/orders/{orderId}/confirm</span></h3>
+            <label>Order ID:</label>
+            <input type="number" id="order-confirm-id" placeholder="e.g., 1">
+            <button class="call" onclick="orderConfirm()">Call Endpoint</button>
+            <div id="order-confirm-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method GET">GET</span> Get Job Status<span class="endpoint-path">/jobs/{jobId}</span></h3>
+            <label>Job ID:</label>
+            <input type="text" id="order-job-id" placeholder="UUID from confirm response">
+            <button class="call" onclick="orderGetJob()">Call Endpoint</button>
+            <div id="order-job-result" class="result"></div>
+        </div>
+    </div>
+
+    <!-- USER SERVICE -->
+    <div id="user" class="panel">
+        <div class="card">
+            <h3><span class="method GET">GET</span> List Users<span class="endpoint-path">/users</span></h3>
+            <div class="form-row">
+                <div>
+                    <label>Page Size:</label>
+                    <input type="number" id="user-list-size" value="10" min="1" max="100">
+                </div>
+                <div>
+                    <label>Page Token:</label>
+                    <input type="text" id="user-list-token" placeholder="Optional">
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Name (filter):</label>
+                    <input type="text" id="user-list-name" placeholder="Optional">
+                </div>
+                <div>
+                    <label>Email (filter):</label>
+                    <input type="email" id="user-list-email" placeholder="Optional">
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Phone (filter):</label>
+                    <input type="text" id="user-list-phone" placeholder="Optional">
+                </div>
+                <div>
+                    <label>Membership Tier (filter):</label>
+                    <select id="user-list-tier">
+                        <option value="">All</option>
+                        <option value="FREE">FREE</option>
+                        <option value="PREMIUM">PREMIUM</option>
+                        <option value="VIP">VIP</option>
+                    </select>
+                </div>
+            </div>
+            <button class="call" onclick="userList()">Call Endpoint</button>
+            <div id="user-list-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method GET">GET</span> Get User<span class="endpoint-path">/users/{user_id}</span></h3>
+            <label>User ID (UUID):</label>
+            <input type="text" id="user-get-id" value="550e8400-e29b-41d4-a716-446655440001" placeholder="e.g., 550e8400-e29b-41d4-a716-446655440001">
+            <button class="call" onclick="userGet()">Call Endpoint</button>
+            <div id="user-get-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method POST">POST</span> Create User<span class="endpoint-path">/users</span></h3>
+            <label>JWT Token (required):</label>
+            <input type="text" id="user-create-token" placeholder="Bearer token from /auth/callback">
+            <label>JSON Body:</label>
+            <textarea id="user-create-body">{
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "phone": "+1234567890",
+  "password": "securepassword123",
+  "membership_tier": "FREE"
+}</textarea>
+            <small>Note: Requires JWT token. Get one from /auth/login → /auth/callback</small>
+            <button class="call" onclick="userCreate()">Call Endpoint</button>
+            <div id="user-create-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method PATCH">PATCH</span> Update User<span class="endpoint-path">/users/{user_id}</span></h3>
+            <label>User ID (UUID):</label>
+            <input type="text" id="user-update-id" placeholder="e.g., 550e8400-e29b-41d4-a716-446655440001">
+            <label>JSON Body:</label>
+            <textarea id="user-update-body">{
+  "name": "Updated Name",
+  "email": "updated@example.com",
+  "phone": "+1234567890",
+  "membership_tier": "PREMIUM"
+}</textarea>
+            <button class="call" onclick="userUpdate()">Call Endpoint</button>
+            <div id="user-update-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method DELETE">DELETE</span> Delete User<span class="endpoint-path">/users/{user_id}</span></h3>
+            <label>User ID (UUID):</label>
+            <input type="text" id="user-delete-id" placeholder="e.g., 550e8400-e29b-41d4-a716-446655440001">
+            <label>JWT Token (required):</label>
+            <input type="text" id="user-delete-token" placeholder="Bearer token from /auth/callback">
+            <button class="call" onclick="userDelete()">Call Endpoint</button>
+            <div id="user-delete-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method GET">GET</span> List Profiles<span class="endpoint-path">/profiles</span></h3>
+            <div class="form-row">
+                <div>
+                    <label>Page Size:</label>
+                    <input type="number" id="profile-list-size" value="10" min="1" max="100">
+                </div>
+                <div>
+                    <label>Page Token:</label>
+                    <input type="text" id="profile-list-token" placeholder="Optional">
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>User ID (filter):</label>
+                    <input type="text" id="profile-list-userid" placeholder="Optional UUID">
+                </div>
+                <div>
+                    <label>Username (filter):</label>
+                    <input type="text" id="profile-list-username" placeholder="Optional">
+                </div>
+            </div>
+            <button class="call" onclick="profileList()">Call Endpoint</button>
+            <div id="profile-list-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method GET">GET</span> Get Profile<span class="endpoint-path">/profiles/{profile_id}</span></h3>
+            <label>Profile ID (UUID):</label>
+            <input type="text" id="profile-get-id" placeholder="e.g., 550e8400-e29b-41d4-a716-446655440001">
+            <button class="call" onclick="profileGet()">Call Endpoint</button>
+            <div id="profile-get-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method POST">POST</span> Create Profile<span class="endpoint-path">/profiles</span></h3>
+            <label>JSON Body:</label>
+            <textarea id="profile-create-body">{
+  "user_id": "550e8400-e29b-41d4-a716-446655440001",
+  "username": "johndoe",
+  "bio": "Software developer",
+  "address": "123 Main St, City, State 12345"
+}</textarea>
+            <button class="call" onclick="profileCreate()">Call Endpoint</button>
+            <div id="profile-create-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method PATCH">PATCH</span> Update Profile<span class="endpoint-path">/profiles/{profile_id}</span></h3>
+            <label>Profile ID (UUID):</label>
+            <input type="text" id="profile-update-id" placeholder="e.g., 550e8400-e29b-41d4-a716-446655440001">
+            <label>JSON Body:</label>
+            <textarea id="profile-update-body">{
+  "bio": "Updated bio",
+  "address": "456 New St, City, State 67890"
+}</textarea>
+            <button class="call" onclick="profileUpdate()">Call Endpoint</button>
+            <div id="profile-update-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method DELETE">DELETE</span> Delete Profile<span class="endpoint-path">/profiles/{profile_id}</span></h3>
+            <label>Profile ID (UUID):</label>
+            <input type="text" id="profile-delete-id" placeholder="e.g., 550e8400-e29b-41d4-a716-446655440001">
+            <button class="call" onclick="profileDelete()">Call Endpoint</button>
+            <div id="profile-delete-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method GET">GET</span> OAuth2 Login<span class="endpoint-path">/auth/login</span></h3>
+            <small>Redirects to Google OAuth. After login, you'll get a JWT token at /auth/callback</small>
+            <button class="call" onclick="userOAuthLogin()">Start OAuth Login</button>
+            <div id="user-oauth-result" class="result"></div>
+        </div>
+    </div>
+
+    <!-- COMPOSITE SERVICE -->
+    <div id="composite" class="panel">
+        <div class="card">
+            <h3><span class="method GET">GET</span> Health Check<span class="endpoint-path">/readyz</span></h3>
+            <button class="call" onclick="compositeHealth()">Call Endpoint</button>
+            <div id="comp-health-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method GET">GET</span> Get User<span class="endpoint-path">/users/{user_id}</span></h3>
+            <label>User ID:</label>
+            <input type="text" id="comp-user-id" value="550e8400-e29b-41d4-a716-446655440001">
+            <button class="call" onclick="compositeGetUser()">Call Endpoint</button>
+            <div id="comp-user-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method GET">GET</span> List Items<span class="endpoint-path">/items</span></h3>
+            <div class="form-row">
+                <div>
+                    <label>Page Size:</label>
+                    <input type="number" id="comp-items-size" value="5" min="1" max="100">
+                </div>
+                <div>
+                    <label>Page Token:</label>
+                    <input type="text" id="comp-items-token" placeholder="Optional">
+                </div>
+            </div>
+            <button class="call" onclick="compositeListItems()">Call Endpoint</button>
+            <div id="comp-items-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method GET">GET</span> Get Item<span class="endpoint-path">/items/{item_id}</span></h3>
+            <label>Item ID:</label>
+            <input type="text" id="comp-item-id" placeholder="e.g., it-abc12345">
+            <button class="call" onclick="compositeGetItem()">Call Endpoint</button>
+            <div id="comp-item-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method POST">POST</span> Create Order (with FK validation)<span class="endpoint-path">/orders</span></h3>
+            <label>JSON Body:</label>
+            <textarea id="comp-order-create-body">{
+  "userId": "550e8400-e29b-41d4-a716-446655440001",
+  "itemId": "it-abc12345",
+  "startDate": "2025-01-01",
+  "endDate": "2025-01-07"
+}</textarea>
+            <small>Note: This validates user and item exist before creating order</small>
+            <button class="call" onclick="compositeCreateOrder()">Call Endpoint</button>
+            <div id="comp-order-create-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method GET">GET</span> Get Order<span class="endpoint-path">/orders/{order_id}</span></h3>
+            <label>Order ID:</label>
+            <input type="text" id="comp-order-id" placeholder="e.g., 1">
+            <button class="call" onclick="compositeGetOrder()">Call Endpoint</button>
+            <div id="comp-order-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method POST">POST</span> Confirm Order (202 Accepted)<span class="endpoint-path">/orders/{order_id}/confirm</span></h3>
+            <label>Order ID:</label>
+            <input type="text" id="comp-confirm-id" placeholder="e.g., 1">
+            <button class="call" onclick="compositeConfirmOrder()">Call Endpoint</button>
+            <div id="comp-confirm-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method GET">GET</span> Get Job Status<span class="endpoint-path">/jobs/{job_id}</span></h3>
+            <label>Job ID:</label>
+            <input type="text" id="comp-job-id" placeholder="UUID from confirm response">
+            <button class="call" onclick="compositeGetJob()">Call Endpoint</button>
+            <div id="comp-job-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method GET">GET</span> Search (Multi-source)<span class="endpoint-path">/search</span></h3>
+            <label>Query (q):</label>
+            <input type="text" id="comp-search-q" placeholder="Search term">
+            <div class="form-row">
+                <div>
+                    <label>Page Size:</label>
+                    <input type="number" id="comp-search-size" value="5" min="1" max="100">
+                </div>
+                <div>
+                    <label>Page Token:</label>
+                    <input type="text" id="comp-search-token" placeholder="Optional">
+                </div>
+            </div>
+            <button class="call" onclick="compositeSearch()">Call Endpoint</button>
+            <div id="comp-search-result" class="result"></div>
+        </div>
+    </div>
+
     <script>
-        const baseUrl = () => document.getElementById('baseUrl').value || 'http://localhost:8080';
-        
-        function showTab(tabName) {
+        // Service URLs
+        const CATALOG_URL = "https://catalog-and-inventory-service-314897419193.europe-west1.run.app";
+        const ORDER_URL = "https://order-and-rental-service-314897419193.europe-west1.run.app";
+        const USER_URL = "https://34.13.123.175";  // Compute Engine Load Balancer (HTTPS)
+        const COMPOSITE_URL = "https://composite-microservice-314897419193.europe-west1.run.app";
+
+        function showTab(tabId) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.querySelector(`#${tabId}`).classList.add('active');
             event.target.classList.add('active');
-            document.getElementById(tabName).classList.add('active');
         }
-        
-        function displayResult(elementId, data, headers = null) {
-            const element = document.getElementById(elementId);
-            element.style.display = 'block';
-            let html = '<pre>';
-            if (headers) {
-                html += '<strong>Response Headers:</strong>\n';
-                Object.entries(headers).forEach(([k, v]) => {
-                    html += `${k}: ${v}\n`;
-                });
-                html += '\n';
-            }
-            html += JSON.stringify(data, null, 2);
-            html += '</pre>';
-            element.innerHTML = html;
-        }
-        
-        async function checkHealth() {
+
+        async function apiCall(url, method, body, resultId, params = null) {
+            const resultEl = document.getElementById(resultId);
+            resultEl.textContent = 'Loading...';
+            resultEl.className = 'result';
+
             try {
-                const response = await fetch(`${baseUrl()}/healthz`);
-                const data = await response.json();
-                displayResult('healthResult', {
-                    status: response.status,
-                    statusText: response.statusText,
-                    data: data
-                });
-            } catch (error) {
-                displayResult('healthResult', { error: error.message });
-            }
-        }
-        
-        async function getUser() {
-            const userId = document.getElementById('userId').value;
-            if (!userId) {
-                alert('Please enter a user ID');
-                return;
-            }
-            try {
-                const response = await fetch(`${baseUrl()}/users/${userId}`);
-                const data = await response.json();
-                const etag = response.headers.get('etag');
-                displayResult('userResult', {
-                    status: response.status,
-                    etag: etag,
-                    data: data
-                }, { 'ETag': etag || 'N/A' });
-            } catch (error) {
-                displayResult('userResult', { error: error.message });
-            }
-        }
-        
-        async function getUserWithETag() {
-            const userId = document.getElementById('userId').value;
-            if (!userId) {
-                alert('Please enter a user ID');
-                return;
-            }
-            try {
-                // First request
-                const response1 = await fetch(`${baseUrl()}/users/${userId}`);
-                const etag1 = response1.headers.get('etag');
-                const data1 = await response1.json();
-                
-                // Second request with If-None-Match
-                const response2 = await fetch(`${baseUrl()}/users/${userId}`, {
-                    headers: { 'If-None-Match': etag1 }
-                });
-                
-                displayResult('userResult', {
-                    firstRequest: {
-                        status: response1.status,
-                        etag: etag1,
-                        data: data1
-                    },
-                    secondRequest: {
-                        status: response2.status,
-                        statusText: response2.statusText,
-                        cached: response2.status === 304
-                    }
-                });
-            } catch (error) {
-                displayResult('userResult', { error: error.message });
-            }
-        }
-        
-        async function listItems() {
-            const pageSize = document.getElementById('itemPageSize').value;
-            const pageToken = document.getElementById('itemPageToken').value;
-            let url = `${baseUrl()}/items?pageSize=${pageSize}`;
-            if (pageToken) url += `&pageToken=${encodeURIComponent(pageToken)}`;
-            
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                displayResult('itemResult', {
-                    status: response.status,
-                    nextPageToken: data.nextPageToken,
-                    itemCount: data.items?.length || 0,
-                    data: data
-                });
-            } catch (error) {
-                displayResult('itemResult', { error: error.message });
-            }
-        }
-        
-        async function getItem() {
-            const itemId = document.getElementById('itemId').value;
-            if (!itemId) {
-                alert('Please enter an item ID');
-                return;
-            }
-            try {
-                const response = await fetch(`${baseUrl()}/items/${itemId}`);
-                const data = await response.json();
-                displayResult('itemResult', {
-                    status: response.status,
-                    data: data
-                });
-            } catch (error) {
-                displayResult('itemResult', { error: error.message });
-            }
-        }
-        
-        async function createOrder() {
-            const userId = document.getElementById('orderUserId').value;
-            const itemId = document.getElementById('orderItemId').value;
-            const startDate = document.getElementById('orderStartDate').value;
-            const endDate = document.getElementById('orderEndDate').value;
-            
-            if (!userId || !itemId || !startDate || !endDate) {
-                alert('Please fill in all fields');
-                return;
-            }
-            
-            try {
-                const startTime = performance.now();
-                const response = await fetch(`${baseUrl()}/orders`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId, itemId, startDate, endDate })
-                });
-                const elapsed = Math.round(performance.now() - startTime);
-                const data = await response.json();
-                
-                const headers = {
-                    'Location': response.headers.get('location'),
-                    'ETag': response.headers.get('etag'),
-                    'X-Composite-Threaded': response.headers.get('x-composite-threaded'),
-                    'X-Composite-Parallel-Ms': response.headers.get('x-composite-parallel-ms'),
-                    'X-Composite-Fanout': response.headers.get('x-composite-fanout')
+                let fullUrl = url;
+                if (params) {
+                    const urlParams = new URLSearchParams();
+                    Object.entries(params).forEach(([k, v]) => {
+                        if (v !== null && v !== undefined && v !== '') {
+                            urlParams.append(k, v);
+                        }
+                    });
+                    const queryString = urlParams.toString();
+                    if (queryString) fullUrl += '?' + queryString;
+                }
+
+                const options = {
+                    method: method,
+                    mode: 'cors',
+                    headers: {}
                 };
                 
-                let result = {
-                    status: response.status,
-                    statusText: response.statusText,
-                    elapsedMs: elapsed,
-                    headers: headers,
-                    data: data
+                if (body) {
+                    options.headers['Content-Type'] = 'application/json';
+                    options.body = typeof body === 'string' ? body : JSON.stringify(body);
+                }
+
+                const response = await fetch(fullUrl, options);
+                let data;
+                let resultText = `Status: ${response.status} ${response.statusText}\n\n`;
+                
+                // Handle headers first
+                if (response.headers.get('Location')) {
+                    resultText += `Location: ${response.headers.get('Location')}\n\n`;
+                }
+                if (response.headers.get('ETag')) {
+                    resultText += `ETag: ${response.headers.get('ETag')}\n\n`;
+                }
+                
+                // For 204 No Content (DELETE) or empty responses, don't try to parse JSON
+                if (response.status === 204 || response.headers.get('content-length') === '0') {
+                    data = { message: 'No content (successful deletion)' };
+                } else {
+                    // Clone the response to avoid "body already consumed" error
+                    const contentType = response.headers.get('content-type') || '';
+                    if (contentType.includes('application/json')) {
+                        try {
+                            data = await response.json();
+                        } catch (e) {
+                            // If JSON parsing fails, try text
+                            const text = await response.text();
+                            data = text ? { message: text } : { message: 'No content' };
+                        }
+                    } else {
+                        // Not JSON, read as text
+                        const text = await response.text();
+                        data = text ? { message: text } : { message: 'No content' };
+                    }
+                }
+                
+                resultText += JSON.stringify(data, null, 2);
+                
+                resultEl.textContent = resultText;
+                resultEl.className = response.ok || response.status === 202 || response.status === 204 ? 'result success' : 'result error';
+            } catch (error) {
+                console.error('Fetch error:', error);
+                resultEl.textContent = `Error: ${error.message}\n\nType: ${error.name}\nCheck console (F12) for details.`;
+                resultEl.className = 'result error';
+            }
+        }
+
+        // Catalog functions
+        function catalogList() {
+            const params = {
+                pageSize: document.getElementById('cat-list-size').value || undefined,
+                nextPageToken: document.getElementById('cat-list-token').value || undefined,
+                category: document.getElementById('cat-list-category').value || undefined,
+                brand: document.getElementById('cat-list-brand').value || undefined,
+                minPrice: document.getElementById('cat-list-minprice').value || undefined,
+                maxPrice: document.getElementById('cat-list-maxprice').value || undefined
+            };
+            apiCall(`${CATALOG_URL}/catalog/items`, 'GET', null, 'cat-list-result', params);
+        }
+
+        function catalogGet() {
+            const id = document.getElementById('cat-get-id').value;
+            if (!id) {
+                document.getElementById('cat-get-result').textContent = 'Please enter an Item ID';
+                document.getElementById('cat-get-result').className = 'result error';
+                return;
+            }
+            apiCall(`${CATALOG_URL}/catalog/items/${id}`, 'GET', null, 'cat-get-result');
+        }
+
+        function catalogCreate() {
+            const body = document.getElementById('cat-create-body').value;
+            try {
+                const parsed = JSON.parse(body);
+                // Replace Date.now() placeholder if present
+                if (parsed.sku && parsed.sku.includes('Date.now()')) {
+                    parsed.sku = parsed.sku.replace('Date.now()', Date.now());
+                }
+                apiCall(`${CATALOG_URL}/catalog/items`, 'POST', JSON.stringify(parsed), 'cat-create-result');
+            } catch (e) {
+                document.getElementById('cat-create-result').textContent = 'Invalid JSON: ' + e.message;
+                document.getElementById('cat-create-result').className = 'result error';
+            }
+        }
+
+        function catalogUpdate() {
+            const id = document.getElementById('cat-update-id').value;
+            const body = document.getElementById('cat-update-body').value;
+            if (!id) {
+                document.getElementById('cat-update-result').textContent = 'Please enter an Item ID';
+                document.getElementById('cat-update-result').className = 'result error';
+                return;
+            }
+            try {
+                JSON.parse(body);
+                apiCall(`${CATALOG_URL}/catalog/items/${id}`, 'PUT', body, 'cat-update-result');
+            } catch (e) {
+                document.getElementById('cat-update-result').textContent = 'Invalid JSON: ' + e.message;
+                document.getElementById('cat-update-result').className = 'result error';
+            }
+        }
+
+        function catalogDelete() {
+            const id = document.getElementById('cat-delete-id').value;
+            if (!id) {
+                document.getElementById('cat-delete-result').textContent = 'Please enter an Item ID';
+                document.getElementById('cat-delete-result').className = 'result error';
+                return;
+            }
+            apiCall(`${CATALOG_URL}/catalog/items/${id}`, 'DELETE', null, 'cat-delete-result');
+        }
+
+        // Order functions
+        function orderList() {
+            const params = {
+                state: document.getElementById('order-list-status').value || undefined,
+                userId: document.getElementById('order-list-userid').value || undefined,
+                itemId: document.getElementById('order-list-itemid').value || undefined,
+                from: document.getElementById('order-list-from').value || undefined,
+                to: document.getElementById('order-list-to').value || undefined
+            };
+            apiCall(`${ORDER_URL}/orders`, 'GET', null, 'order-list-result', params);
+        }
+
+        function orderGet() {
+            const id = document.getElementById('order-get-id').value;
+            if (!id) {
+                document.getElementById('order-get-result').textContent = 'Please enter an Order ID';
+                document.getElementById('order-get-result').className = 'result error';
+                return;
+            }
+            apiCall(`${ORDER_URL}/orders/${id}`, 'GET', null, 'order-get-result');
+        }
+
+        function orderCreate() {
+            const body = document.getElementById('order-create-body').value;
+            try {
+                JSON.parse(body);
+                apiCall(`${ORDER_URL}/orders`, 'POST', body, 'order-create-result');
+            } catch (e) {
+                document.getElementById('order-create-result').textContent = 'Invalid JSON: ' + e.message;
+                document.getElementById('order-create-result').className = 'result error';
+            }
+        }
+
+        function orderCancel() {
+            const id = document.getElementById('order-cancel-id').value;
+            if (!id) {
+                document.getElementById('order-cancel-result').textContent = 'Please enter an Order ID';
+                document.getElementById('order-cancel-result').className = 'result error';
+                return;
+            }
+            apiCall(`${ORDER_URL}/orders/${id}`, 'DELETE', null, 'order-cancel-result');
+        }
+
+        function orderUpdateStatus() {
+            const id = document.getElementById('order-status-id').value;
+            const bodyText = document.getElementById('order-status-body').value;
+            if (!id) {
+                document.getElementById('order-status-result').textContent = 'Please enter an Order ID';
+                document.getElementById('order-status-result').className = 'result error';
+                return;
+            }
+            try {
+                const parsed = JSON.parse(bodyText);
+                // If user pasted full order object, extract just new_status
+                let requestBody;
+                if (parsed.new_status) {
+                    // Already has new_status field
+                    requestBody = { new_status: parsed.new_status };
+                } else if (parsed.status) {
+                    // Has status field, use it as new_status
+                    requestBody = { new_status: parsed.status };
+                } else {
+                    // Use as-is (should have new_status)
+                    requestBody = parsed;
+                }
+                apiCall(`${ORDER_URL}/orders/${id}/status`, 'PATCH', JSON.stringify(requestBody), 'order-status-result');
+            } catch (e) {
+                document.getElementById('order-status-result').textContent = 'Invalid JSON: ' + e.message;
+                document.getElementById('order-status-result').className = 'result error';
+            }
+        }
+
+        function orderGetLogs() {
+            const id = document.getElementById('order-logs-id').value;
+            if (!id) {
+                document.getElementById('order-logs-result').textContent = 'Please enter an Order ID';
+                document.getElementById('order-logs-result').className = 'result error';
+                return;
+            }
+            apiCall(`${ORDER_URL}/orders/${id}/logs`, 'GET', null, 'order-logs-result');
+        }
+
+        function orderConfirm() {
+            const id = document.getElementById('order-confirm-id').value;
+            if (!id) {
+                document.getElementById('order-confirm-result').textContent = 'Please enter an Order ID';
+                document.getElementById('order-confirm-result').className = 'result error';
+                return;
+            }
+            apiCall(`${ORDER_URL}/orders/${id}/confirm`, 'POST', null, 'order-confirm-result');
+        }
+
+        function orderGetJob() {
+            const id = document.getElementById('order-job-id').value;
+            if (!id) {
+                document.getElementById('order-job-result').textContent = 'Please enter a Job ID';
+                document.getElementById('order-job-result').className = 'result error';
+                return;
+            }
+            apiCall(`${ORDER_URL}/jobs/${id}`, 'GET', null, 'order-job-result');
+        }
+
+        // Composite functions
+        function compositeHealth() {
+            apiCall(`${COMPOSITE_URL}/readyz`, 'GET', null, 'comp-health-result');
+        }
+
+        function compositeGetUser() {
+            const id = document.getElementById('comp-user-id').value;
+            if (!id) {
+                document.getElementById('comp-user-result').textContent = 'Please enter a User ID';
+                document.getElementById('comp-user-result').className = 'result error';
+                return;
+            }
+            apiCall(`${COMPOSITE_URL}/users/${id}`, 'GET', null, 'comp-user-result');
+        }
+
+        function compositeListItems() {
+            const params = {
+                pageSize: document.getElementById('comp-items-size').value || undefined,
+                pageToken: document.getElementById('comp-items-token').value || undefined
+            };
+            apiCall(`${COMPOSITE_URL}/items`, 'GET', null, 'comp-items-result', params);
+        }
+
+        function compositeGetItem() {
+            const id = document.getElementById('comp-item-id').value;
+            if (!id) {
+                document.getElementById('comp-item-result').textContent = 'Please enter an Item ID';
+                document.getElementById('comp-item-result').className = 'result error';
+                return;
+            }
+            apiCall(`${COMPOSITE_URL}/items/${id}`, 'GET', null, 'comp-item-result');
+        }
+
+        function compositeCreateOrder() {
+            const body = document.getElementById('comp-order-create-body').value;
+            try {
+                JSON.parse(body);
+                apiCall(`${COMPOSITE_URL}/orders`, 'POST', body, 'comp-order-create-result');
+            } catch (e) {
+                document.getElementById('comp-order-create-result').textContent = 'Invalid JSON: ' + e.message;
+                document.getElementById('comp-order-create-result').className = 'result error';
+            }
+        }
+
+        function compositeGetOrder() {
+            const id = document.getElementById('comp-order-id').value;
+            if (!id) {
+                document.getElementById('comp-order-result').textContent = 'Please enter an Order ID';
+                document.getElementById('comp-order-result').className = 'result error';
+                return;
+            }
+            apiCall(`${COMPOSITE_URL}/orders/${id}`, 'GET', null, 'comp-order-result');
+        }
+
+        function compositeConfirmOrder() {
+            const id = document.getElementById('comp-confirm-id').value;
+            if (!id) {
+                document.getElementById('comp-confirm-result').textContent = 'Please enter an Order ID';
+                document.getElementById('comp-confirm-result').className = 'result error';
+                return;
+            }
+            apiCall(`${COMPOSITE_URL}/orders/${id}/confirm`, 'POST', null, 'comp-confirm-result');
+        }
+
+        function compositeGetJob() {
+            const id = document.getElementById('comp-job-id').value;
+            if (!id) {
+                document.getElementById('comp-job-result').textContent = 'Please enter a Job ID';
+                document.getElementById('comp-job-result').className = 'result error';
+                return;
+            }
+            apiCall(`${COMPOSITE_URL}/jobs/${id}`, 'GET', null, 'comp-job-result');
+        }
+
+        function compositeSearch() {
+            const q = document.getElementById('comp-search-q').value;
+            if (!q) {
+                document.getElementById('comp-search-result').textContent = 'Please enter a search query';
+                document.getElementById('comp-search-result').className = 'result error';
+                return;
+            }
+            const params = {
+                q: q,
+                pageSize: document.getElementById('comp-search-size').value || undefined,
+                pageToken: document.getElementById('comp-search-token').value || undefined
+            };
+            apiCall(`${COMPOSITE_URL}/search`, 'GET', null, 'comp-search-result', params);
+        }
+
+        // User Service functions
+        function userList() {
+            const params = {
+                pageSize: document.getElementById('user-list-size').value || undefined,
+                pageToken: document.getElementById('user-list-token').value || undefined,
+                name: document.getElementById('user-list-name').value || undefined,
+                email: document.getElementById('user-list-email').value || undefined,
+                phone: document.getElementById('user-list-phone').value || undefined,
+                membership_tier: document.getElementById('user-list-tier').value || undefined
+            };
+            apiCall(`${USER_URL}/users`, 'GET', null, 'user-list-result', params);
+        }
+
+        function userGet() {
+            const id = document.getElementById('user-get-id').value;
+            if (!id) {
+                document.getElementById('user-get-result').textContent = 'Please enter a User ID';
+                document.getElementById('user-get-result').className = 'result error';
+                return;
+            }
+            apiCall(`${USER_URL}/users/${id}`, 'GET', null, 'user-get-result');
+        }
+
+        function userCreate() {
+            const token = document.getElementById('user-create-token').value;
+            const body = document.getElementById('user-create-body').value;
+            if (!token) {
+                document.getElementById('user-create-result').textContent = 'JWT Token is required for this endpoint';
+                document.getElementById('user-create-result').className = 'result error';
+                return;
+            }
+            try {
+                JSON.parse(body);
+                apiCallWithAuth(`${USER_URL}/users`, 'POST', body, 'user-create-result', token);
+            } catch (e) {
+                document.getElementById('user-create-result').textContent = 'Invalid JSON: ' + e.message;
+                document.getElementById('user-create-result').className = 'result error';
+            }
+        }
+
+        function userUpdate() {
+            const id = document.getElementById('user-update-id').value;
+            const body = document.getElementById('user-update-body').value;
+            if (!id) {
+                document.getElementById('user-update-result').textContent = 'Please enter a User ID';
+                document.getElementById('user-update-result').className = 'result error';
+                return;
+            }
+            try {
+                JSON.parse(body);
+                apiCall(`${USER_URL}/users/${id}`, 'PATCH', body, 'user-update-result');
+            } catch (e) {
+                document.getElementById('user-update-result').textContent = 'Invalid JSON: ' + e.message;
+                document.getElementById('user-update-result').className = 'result error';
+            }
+        }
+
+        function userDelete() {
+            const id = document.getElementById('user-delete-id').value;
+            const token = document.getElementById('user-delete-token').value;
+            if (!id) {
+                document.getElementById('user-delete-result').textContent = 'Please enter a User ID';
+                document.getElementById('user-delete-result').className = 'result error';
+                return;
+            }
+            if (!token) {
+                document.getElementById('user-delete-result').textContent = 'JWT Token is required for this endpoint';
+                document.getElementById('user-delete-result').className = 'result error';
+                return;
+            }
+            apiCallWithAuth(`${USER_URL}/users/${id}`, 'DELETE', null, 'user-delete-result', token);
+        }
+
+        function profileList() {
+            const params = {
+                pageSize: document.getElementById('profile-list-size').value || undefined,
+                pageToken: document.getElementById('profile-list-token').value || undefined,
+                user_id: document.getElementById('profile-list-userid').value || undefined,
+                username: document.getElementById('profile-list-username').value || undefined
+            };
+            apiCall(`${USER_URL}/profiles`, 'GET', null, 'profile-list-result', params);
+        }
+
+        function profileGet() {
+            const id = document.getElementById('profile-get-id').value;
+            if (!id) {
+                document.getElementById('profile-get-result').textContent = 'Please enter a Profile ID';
+                document.getElementById('profile-get-result').className = 'result error';
+                return;
+            }
+            apiCall(`${USER_URL}/profiles/${id}`, 'GET', null, 'profile-get-result');
+        }
+
+        function profileCreate() {
+            const body = document.getElementById('profile-create-body').value;
+            try {
+                JSON.parse(body);
+                apiCall(`${USER_URL}/profiles`, 'POST', body, 'profile-create-result');
+            } catch (e) {
+                document.getElementById('profile-create-result').textContent = 'Invalid JSON: ' + e.message;
+                document.getElementById('profile-create-result').className = 'result error';
+            }
+        }
+
+        function profileUpdate() {
+            const id = document.getElementById('profile-update-id').value;
+            const body = document.getElementById('profile-update-body').value;
+            if (!id) {
+                document.getElementById('profile-update-result').textContent = 'Please enter a Profile ID';
+                document.getElementById('profile-update-result').className = 'result error';
+                return;
+            }
+            try {
+                JSON.parse(body);
+                apiCall(`${USER_URL}/profiles/${id}`, 'PATCH', body, 'profile-update-result');
+            } catch (e) {
+                document.getElementById('profile-update-result').textContent = 'Invalid JSON: ' + e.message;
+                document.getElementById('profile-update-result').className = 'result error';
+            }
+        }
+
+        function profileDelete() {
+            const id = document.getElementById('profile-delete-id').value;
+            if (!id) {
+                document.getElementById('profile-delete-result').textContent = 'Please enter a Profile ID';
+                document.getElementById('profile-delete-result').className = 'result error';
+                return;
+            }
+            apiCall(`${USER_URL}/profiles/${id}`, 'DELETE', null, 'profile-delete-result');
+        }
+
+        function userOAuthLogin() {
+            // Open OAuth login in new window
+            window.open(`${USER_URL}/auth/login`, '_blank');
+            document.getElementById('user-oauth-result').textContent = 'OAuth login opened in new window. After login, you will be redirected to /auth/callback where you can get your JWT token.';
+            document.getElementById('user-oauth-result').className = 'result success';
+        }
+
+        // Helper function for API calls with JWT authentication
+        async function apiCallWithAuth(url, method, body, resultId, token, params = null) {
+            const resultEl = document.getElementById(resultId);
+            resultEl.textContent = 'Loading...';
+            resultEl.className = 'result';
+
+            try {
+                let fullUrl = url;
+                if (params) {
+                    const urlParams = new URLSearchParams();
+                    Object.entries(params).forEach(([k, v]) => {
+                        if (v !== null && v !== undefined && v !== '') {
+                            urlParams.append(k, v);
+                        }
+                    });
+                    const queryString = urlParams.toString();
+                    if (queryString) fullUrl += '?' + queryString;
+                }
+
+                const options = {
+                    method: method,
+                    mode: 'cors',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 };
                 
-                if (response.status === 201) {
-                    result.parallelInfo = '✅ Order created using parallel threads!';
-                } else if (response.status === 422) {
-                    result.fkError = '❌ FK Validation Failed: ' + (data.detail?.message || 'Unknown error');
+                if (body) {
+                    options.headers['Content-Type'] = 'application/json';
+                    options.body = typeof body === 'string' ? body : JSON.stringify(body);
+                }
+
+                const response = await fetch(fullUrl, options);
+                let data;
+                let resultText = `Status: ${response.status} ${response.statusText}\n\n`;
+                
+                if (response.headers.get('Location')) {
+                    resultText += `Location: ${response.headers.get('Location')}\n\n`;
+                }
+                if (response.headers.get('ETag')) {
+                    resultText += `ETag: ${response.headers.get('ETag')}\n\n`;
                 }
                 
-                displayResult('orderResult', result, headers);
-            } catch (error) {
-                displayResult('orderResult', { error: error.message });
-            }
-        }
-        
-        async function testFKFailure() {
-            try {
-                const response = await fetch(`${baseUrl()}/orders`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        userId: 'non-existent-user',
-                        itemId: 'non-existent-item',
-                        startDate: '2025-12-01',
-                        endDate: '2025-12-05'
-                    })
-                });
-                const data = await response.json();
-                displayResult('orderResult', {
-                    status: response.status,
-                    fkValidation: 'FK constraint enforced!',
-                    error: data.detail
-                });
-            } catch (error) {
-                displayResult('orderResult', { error: error.message });
-            }
-        }
-        
-        async function getOrder() {
-            const orderId = document.getElementById('orderId').value;
-            if (!orderId) {
-                alert('Please enter an order ID');
-                return;
-            }
-            try {
-                const response = await fetch(`${baseUrl()}/orders/${orderId}`);
-                const data = await response.json();
-                displayResult('orderResult', {
-                    status: response.status,
-                    data: data
-                });
-            } catch (error) {
-                displayResult('orderResult', { error: error.message });
-            }
-        }
-        
-        async function search() {
-            const query = document.getElementById('searchQuery').value;
-            const pageSize = document.getElementById('searchPageSize').value;
-            const pageToken = document.getElementById('searchPageToken').value;
-            
-            if (!query) {
-                alert('Please enter a search query');
-                return;
-            }
-            
-            let url = `${baseUrl()}/search?q=${encodeURIComponent(query)}&pageSize=${pageSize}`;
-            if (pageToken) url += `&pageToken=${encodeURIComponent(pageToken)}`;
-            
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                displayResult('searchResult', {
-                    status: response.status,
-                    resultCount: data.results?.length || 0,
-                    nextPageToken: data.nextPageToken,
-                    data: data
-                });
-            } catch (error) {
-                displayResult('searchResult', { error: error.message });
-            }
-        }
-        
-        async function confirmOrder() {
-            const orderId = document.getElementById('confirmOrderId').value;
-            if (!orderId) {
-                alert('Please enter an order ID');
-                return;
-            }
-            try {
-                const response = await fetch(`${baseUrl()}/orders/${orderId}/confirm`, {
-                    method: 'POST'
-                });
-                const data = await response.json();
-                const location = response.headers.get('location');
-                
-                displayResult('jobResult', {
-                    status: response.status,
-                    statusText: response.statusText,
-                    location: location,
-                    jobId: location ? location.split('/').pop() : 'N/A',
-                    message: response.status === 202 ? '✅ 202 Accepted - Job created' : 'Unexpected status',
-                    data: data
-                });
-                
-                if (location) {
-                    document.getElementById('jobId').value = location.split('/').pop();
-                }
-            } catch (error) {
-                displayResult('jobResult', { error: error.message });
-            }
-        }
-        
-        async function getJobStatus() {
-            const jobId = document.getElementById('jobId').value;
-            if (!jobId) {
-                alert('Please enter a job ID');
-                return;
-            }
-            try {
-                const response = await fetch(`${baseUrl()}/jobs/${jobId}`);
-                const data = await response.json();
-                displayResult('jobResult', {
-                    status: response.status,
-                    jobStatus: data.status,
-                    data: data
-                });
-            } catch (error) {
-                displayResult('jobResult', { error: error.message });
-            }
-        }
-        
-        async function pollJobStatus() {
-            const jobId = document.getElementById('jobId').value;
-            if (!jobId) {
-                alert('Please enter a job ID');
-                return;
-            }
-            
-            const resultDiv = document.getElementById('jobResult');
-            resultDiv.style.display = 'block';
-            resultDiv.innerHTML = '<div class="loading"></div> Polling job status...';
-            
-            const maxAttempts = 10;
-            let attempts = 0;
-            
-            const poll = setInterval(async () => {
-                attempts++;
-                try {
-                    const response = await fetch(`${baseUrl()}/jobs/${jobId}`);
-                    const data = await response.json();
-                    const status = data.status;
-                    
-                    let statusClass = 'job-pending';
-                    if (status === 'processing') statusClass = 'job-processing';
-                    else if (status === 'completed') statusClass = 'job-completed';
-                    else if (status === 'failed') statusClass = 'job-failed';
-                    
-                    resultDiv.innerHTML = `
-                        <div class="job-status ${statusClass}">Status: ${status.toUpperCase()}</div>
-                        <pre>${JSON.stringify(data, null, 2)}</pre>
-                        <p>Polling attempt: ${attempts}/${maxAttempts}</p>
-                    `;
-                    
-                    if (status === 'completed' || status === 'failed' || attempts >= maxAttempts) {
-                        clearInterval(poll);
+                if (response.status === 204 || response.headers.get('content-length') === '0') {
+                    data = { message: 'No content (successful deletion)' };
+                } else {
+                    const contentType = response.headers.get('content-type') || '';
+                    if (contentType.includes('application/json')) {
+                        try {
+                            data = await response.json();
+                        } catch (e) {
+                            const text = await response.text();
+                            data = text ? { message: text } : { message: 'No content' };
+                        }
+                    } else {
+                        const text = await response.text();
+                        data = text ? { message: text } : { message: 'No content' };
                     }
-                } catch (error) {
-                    resultDiv.innerHTML = `<pre>Error: ${error.message}</pre>`;
-                    clearInterval(poll);
                 }
-            }, 2000);
+                
+                resultText += JSON.stringify(data, null, 2);
+                
+                resultEl.textContent = resultText;
+                resultEl.className = response.ok || response.status === 202 || response.status === 204 ? 'result success' : 'result error';
+            } catch (error) {
+                console.error('Fetch error:', error);
+                resultEl.textContent = `Error: ${error.message}\n\nType: ${error.name}\nCheck console (F12) for details.`;
+                resultEl.className = 'result error';
+            }
         }
-        
-        // Set default dates
-        document.addEventListener('DOMContentLoaded', () => {
-            const today = new Date();
-            const tomorrow = new Date(today);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            const nextWeek = new Date(today);
-            nextWeek.setDate(nextWeek.getDate() + 7);
-            
-            document.getElementById('orderStartDate').value = tomorrow.toISOString().split('T')[0];
-            document.getElementById('orderEndDate').value = nextWeek.toISOString().split('T')[0];
-        });
     </script>
 </body>
 </html>
-
