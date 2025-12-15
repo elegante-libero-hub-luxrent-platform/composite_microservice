@@ -1,7 +1,7 @@
 import asyncio
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from httpx import AsyncClient
 
 from config import Settings
@@ -56,6 +56,28 @@ async def search(
         )
 
     items_resp, orders_resp = await asyncio.gather(fetch_items(), fetch_orders())
+    
+    # Handle catalog service errors gracefully
+    if items_resp.status_code >= 500:
+        # If catalog service fails, still return orders if available
+        if orders_resp.status_code < 500:
+            orders_resp.raise_for_status()
+            orders_body = orders_resp.json()
+            merged = [{"source": "order", **order} for order in orders_body.get("orders", [])]
+            merged = merged[:size]
+            return {
+                "results": merged,
+                "nextPageToken": merge_tokens({"orders": orders_body.get("nextPageToken")}),
+                "pageSize": size,
+                "warning": "Catalog service unavailable, showing orders only"
+            }
+        else:
+            raise HTTPException(
+                status_code=502,
+                detail=f"Catalog service error: {items_resp.status_code}. "
+                       f"Please check catalog service health at {settings.catalog_svc_base}"
+            )
+    
     items_resp.raise_for_status()
     orders_resp.raise_for_status()
 

@@ -274,9 +274,9 @@
         
         <div class="tabs">
             <button class="tab active" onclick="showTab('health')">Health</button>
-            <button class="tab" onclick="showTab('users')">Users</button>
-            <button class="tab" onclick="showTab('items')">Items</button>
-            <button class="tab" onclick="showTab('orders')">Orders</button>
+            <button class="tab" onclick="showTab('users')">User & Profile</button>
+            <button class="tab" onclick="showTab('items')">Catalog & Inventory</button>
+            <button class="tab" onclick="showTab('orders')">Order & Rental</button>
             <button class="tab" onclick="showTab('search')">Search</button>
             <button class="tab" onclick="showTab('jobs')">Jobs</button>
         </div>
@@ -288,9 +288,9 @@
             <div id="healthResult" class="result-box" style="display:none;"></div>
         </div>
         
-        <!-- Users Tab -->
+        <!-- User & Profile Service Tab -->
         <div id="users" class="tab-content">
-            <h2>User Operations</h2>
+            <h2>User & Profile Service</h2>
             <div class="form-group">
                 <label>User ID:</label>
                 <input type="text" id="userId" placeholder="Enter user ID (UUID format)">
@@ -300,9 +300,9 @@
             <div id="userResult" class="result-box" style="display:none;"></div>
         </div>
         
-        <!-- Items Tab -->
+        <!-- Catalog & Inventory Service Tab -->
         <div id="items" class="tab-content">
-            <h2>Item Operations</h2>
+            <h2>Catalog & Inventory Service</h2>
             <div class="form-group">
                 <label>Page Size:</label>
                 <input type="number" id="itemPageSize" value="5" min="1" max="100">
@@ -320,9 +320,9 @@
             <div id="itemResult" class="result-box" style="display:none;"></div>
         </div>
         
-        <!-- Orders Tab -->
+        <!-- Order & Rental Service Tab -->
         <div id="orders" class="tab-content">
-            <h2>Order Operations</h2>
+            <h2>Order & Rental Service</h2>
             <div class="form-group">
                 <label>User ID:</label>
                 <input type="text" id="orderUserId" placeholder="Enter user ID">

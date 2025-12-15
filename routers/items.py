@@ -32,6 +32,15 @@ async def list_items(
         params=params,
         retries=settings.http_retries,
     )
+    
+    # Handle catalog service errors gracefully
+    if upstream.status_code >= 500:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Catalog service error: {upstream.status_code}. "
+                   f"Please check catalog service health at {settings.catalog_svc_base}"
+        )
+    
     upstream.raise_for_status()
     etag = upstream.headers.get("etag") or strong_etag_bytes(upstream.content)
     response = Response(
@@ -56,8 +65,18 @@ async def get_item(
         f"{settings.catalog_svc_base}/catalog/items/{item_id}",
         retries=settings.http_retries,
     )
+    
     if upstream.status_code == 404:
         raise HTTPException(status_code=404, detail="Item not found")
+    
+    # Handle catalog service errors gracefully
+    if upstream.status_code >= 500:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Catalog service error: {upstream.status_code}. "
+                   f"Please check catalog service health at {settings.catalog_svc_base}"
+        )
+    
     upstream.raise_for_status()
     etag = upstream.headers.get("etag") or strong_etag_bytes(upstream.content)
     response = Response(
