@@ -36,6 +36,24 @@ async def get_user(
 
     if upstream.status_code == 404:
         raise http_error(404, code="USER_NOT_FOUND", message="User not found")
+    
+    # Handle 500 errors from user service - likely means user not found
+    # (user service should return 404, but if it returns 500, handle gracefully)
+    if upstream.status_code >= 500:
+        # Check if response indicates user not found
+        try:
+            error_body = upstream.json()
+            if "not found" in str(error_body).lower() or "does not exist" in str(error_body).lower():
+                raise http_error(404, code="USER_NOT_FOUND", message="User not found")
+        except:
+            pass
+        # If we can't determine, return 502 Bad Gateway
+        raise http_error(
+            502,
+            code="USER_SERVICE_ERROR",
+            message=f"User service error: {upstream.status_code}. "
+                   f"Please check user service health at {settings.user_svc_base}"
+        )
 
     upstream.raise_for_status()
 
