@@ -52,13 +52,13 @@ async def create_order(
     )
     fanout_elapsed_ms = int((time.perf_counter() - fanout_start) * 1000)
 
-    if user_resp.status_code == 404:
+    if user_resp.status_code in (404, 422):
         raise http_error(
-            422, code="FK_USER_NOT_FOUND", message="Referenced user does not exist"
+            422, code="FK_USER_NOT_FOUND", message="Referenced user does not exist or is invalid"
         )
-    if item_resp.status_code == 404:
+    if item_resp.status_code in (404, 422):
         raise http_error(
-            422, code="FK_ITEM_NOT_FOUND", message="Referenced item does not exist"
+            422, code="FK_ITEM_NOT_FOUND", message="Referenced item does not exist or is invalid"
         )
     user_resp.raise_for_status()
     item_resp.raise_for_status()
@@ -87,7 +87,9 @@ async def create_order(
             code="ITEM_UNAVAILABLE",
             message="Item is not available for the requested window",
         )
-    availability_resp.raise_for_status()
+    # Skip availability check if endpoint not implemented (501)
+    if availability_resp.status_code != 501:
+        availability_resp.raise_for_status()
 
     create_resp = await request_with_retry(
         client,
