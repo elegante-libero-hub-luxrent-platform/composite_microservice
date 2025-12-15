@@ -91,11 +91,36 @@ async def create_order(
     if availability_resp.status_code != 501:
         availability_resp.raise_for_status()
 
+    # Convert camelCase to snake_case and handle ID format conversion
+    # Order service expects: user_id (int), item_id (int), start_date, end_date
+    # Try to convert string IDs to integers if they're numeric
+    def try_convert_to_int(id_str: str, id_type: str) -> int:
+        """Try to convert ID string to integer, raise error if not possible"""
+        try:
+            return int(id_str)
+        except (ValueError, TypeError):
+            raise http_error(
+                422,
+                code=f"INVALID_{id_type}_ID_FORMAT",
+                message=f"{id_type} ID must be a numeric integer. "
+                       f"Received: '{id_str}' (UUID/string format not supported by order service). "
+                       f"Please use integer IDs for order creation."
+            )
+    
+    order_payload = {
+        "user_id": try_convert_to_int(order.userId, "USER"),
+        "item_id": try_convert_to_int(order.itemId, "ITEM"),
+    }
+    if order.startDate:
+        order_payload["start_date"] = order.startDate
+    if order.endDate:
+        order_payload["end_date"] = order.endDate
+    
     create_resp = await request_with_retry(
         client,
         "POST",
         f"{settings.order_svc_base}/orders",
-        json=order.model_dump(exclude_none=True),
+        json=order_payload,
         retries=settings.http_retries,
     )
     if create_resp.status_code >= 400:
