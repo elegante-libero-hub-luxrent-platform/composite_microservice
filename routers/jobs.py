@@ -23,6 +23,15 @@ async def confirm_order(
     )
     if upstream.status_code == 404:
         raise HTTPException(status_code=404, detail="Order not found")
+    
+    if upstream.status_code >= 400:
+        # Forward the error from the upstream service
+        try:
+            detail = upstream.json()
+        except Exception:
+            detail = upstream.text
+        raise HTTPException(status_code=upstream.status_code, detail=detail)
+
     if upstream.status_code != 202:
         upstream.raise_for_status()
 

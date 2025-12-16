@@ -1,4 +1,5 @@
 import asyncio
+import json
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
@@ -57,58 +58,56 @@ async def search(
 
     items_resp, orders_resp = await asyncio.gather(fetch_items(), fetch_orders())
     
-    # Handle catalog service errors gracefully
-    if items_resp.status_code >= 500:
-        # If catalog service fails, still return orders if available
-        if orders_resp.status_code < 500:
-            orders_resp.raise_for_status()
-            orders_body = orders_resp.json()
-            # Handle order service response - it can return array directly or object with orders key
-            orders_list = orders_body if isinstance(orders_body, list) else orders_body.get("orders", [])
-            merged = [{"source": "order", **order} for order in orders_list]
-            merged = merged[:size]
-            return {
-                "results": merged,
-                "nextPageToken": merge_tokens({"orders": orders_body.get("nextPageToken") if isinstance(orders_body, dict) else None}),
-                "pageSize": size,
-                "warning": "Catalog service unavailable, showing orders only"
-            }
-        else:
-            raise HTTPException(
-                status_code=502,
-                detail=f"Catalog service error: {items_resp.status_code}. "
-                       f"Please check catalog service health at {settings.catalog_svc_base}"
-            )
+    # Process Catalog Response
+    items_list = []
+    items_token = None
+    items_etag = None
+    if items_resp.status_code < 400:
+        items_body = items_resp.json()
+        items_list = items_body.get("items", [])
+        items_token = items_body.get("nextPageToken")
+        items_etag = items_resp.headers.get("etag")
     
-    items_resp.raise_for_status()
-    orders_resp.raise_for_status()
+    # Process Order Response
+    orders_list = []
+    orders_token = None
+    orders_etag = None
+    if orders_resp.status_code < 400:
+        orders_body = orders_resp.json()
+        orders_list = orders_body if isinstance(orders_body, list) else orders_body.get("orders", [])
+        orders_token = orders_body.get("nextPageToken") if isinstance(orders_body, dict) else None
+        orders_etag = orders_resp.headers.get("etag")
 
-    items_body = items_resp.json()
-    orders_body = orders_resp.json()
+    # If both failed with 5xx, raise error
+    if items_resp.status_code >= 500 and orders_resp.status_code >= 500:
+        raise HTTPException(
+            status_code=502,
+            detail="Both upstream services (Catalog and Order) are unavailable."
+        )
 
     merged = []
-    for item in items_body.get("items", []):
+    for item in items_list:
         merged.append({"source": "catalog", **item})
-    
-    # Handle order service response - it can return array directly or object with orders key
-    orders_list = orders_body if isinstance(orders_body, list) else orders_body.get("orders", [])
     for order in orders_list:
         merged.append({"source": "order", **order})
-
+    
     merged = merged[:size]
+    
     next_token = merge_tokens(
         {
-            "items": items_body.get("nextPageToken"),
-            "orders": orders_body.get("nextPageToken") if isinstance(orders_body, dict) else None,
+            "items": items_token,
+            "orders": orders_token,
         }
     )
 
     etag = combined_etag(
-        [items_resp.headers.get("etag"), orders_resp.headers.get("etag")]
+        [e for e in [items_etag, orders_etag] if e]
     )
-    if not etag:
-        etag = strong_etag_bytes(
-            (items_resp.content + b"|" + orders_resp.content)
-        )
-    response.headers["ETag"] = etag
+    if not etag and merged:
+        # Fallback etag
+        etag = strong_etag_bytes(json.dumps(merged, sort_keys=True).encode())
+
+    if etag:
+        response.headers["ETag"] = etag
+    
     return {"results": merged, "nextPageToken": next_token, "pageSize": size}
