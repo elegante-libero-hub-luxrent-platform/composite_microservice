@@ -90,20 +90,249 @@
         .result.error { border-color: #dc3545; background: #f8d7da; }
         label { font-weight: 600; color: #555; font-size: 13px; display: block; margin-bottom: 5px; }
         .endpoint-path { color: #666; font-size: 12px; font-family: monospace; margin-left: 10px; }
+        iframe { width: 100%; height: 800px; border: 1px solid #ddd; border-radius: 6px; }
+        .deployment-info { background: #e8f5e9; padding: 15px; border-radius: 6px; margin-bottom: 15px; }
+        .deployment-info h4 { margin-top: 0; color: #2e7d32; }
+        .deployment-info code { background: #fff; padding: 2px 6px; border-radius: 3px; }
+        .screenshot-placeholder { 
+            background: #f5f5f5; 
+            border: 2px dashed #ccc; 
+            padding: 40px; 
+            text-align: center; 
+            border-radius: 6px; 
+            color: #666; 
+            margin: 15px 0;
+        }
+        .requirement-section {
+            margin: 15px 0;
+            padding: 15px;
+            background: #fafafa;
+            border-radius: 6px;
+            border-left: 4px solid #4CAF50;
+        }
+        .requirement-section h4 {
+            margin-top: 0;
+            color: #333;
+            font-size: 14px;
+        }
+        .screenshot-section {
+            min-height: 100px;
+            margin-top: 10px;
+        }
+        .screenshot-section img {
+            max-width: 100%;
+            border-radius: 6px;
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .screenshot-item {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            border: 1px solid #e0e0e0;
+        }
+        .screenshot-item p {
+            font-size: 12px;
+            color: #666;
+            margin: 5px 0;
+        }
+        .screenshot-item button {
+            margin-top: 5px;
+            padding: 4px 8px;
+            background: #f93e3e;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+        }
     </style>
 </head>
 <body>
     <h1>🏠 Luxury Rental Platform - Complete API Testing UI</h1>
     
     <div class="tabs">
-        <button class="tab active" onclick="showTab('catalog')">Catalog Service</button>
+        <button class="tab active" onclick="showTab('user')">User Service</button>
+        <button class="tab" onclick="showTab('catalog')">Catalog Service</button>
         <button class="tab" onclick="showTab('order')">Order Service</button>
-        <button class="tab" onclick="showTab('user')">User Service</button>
         <button class="tab" onclick="showTab('composite')">Composite Service</button>
+        <button class="tab" onclick="showTab('api-docs')">API Documentation</button>
+        <button class="tab" onclick="showTab('deployment')">GCP Deployment</button>
+        <button class="tab" onclick="showTab('screenshots')">Demonstration Screenshots</button>
+    </div>
+
+    <!-- USER SERVICE -->
+    <div id="user" class="panel active">
+        <div class="card">
+            <h3><span class="method GET">GET</span> List Users<span class="endpoint-path">/users</span></h3>
+            <div class="form-row">
+                <div>
+                    <label>Page Size:</label>
+                    <input type="number" id="user-list-size" value="10" min="1" max="100">
+                </div>
+                <div>
+                    <label>Page Token:</label>
+                    <input type="text" id="user-list-token" placeholder="Optional">
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Name (filter):</label>
+                    <input type="text" id="user-list-name" placeholder="Optional">
+                </div>
+                <div>
+                    <label>Email (filter):</label>
+                    <input type="email" id="user-list-email" placeholder="Optional">
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Phone (filter):</label>
+                    <input type="text" id="user-list-phone" placeholder="Optional">
+                </div>
+                <div>
+                    <label>Membership Tier (filter):</label>
+                    <select id="user-list-tier">
+                        <option value="">All</option>
+                        <option value="FREE">FREE</option>
+                        <option value="PREMIUM">PREMIUM</option>
+                        <option value="VIP">VIP</option>
+                    </select>
+                </div>
+            </div>
+            <button class="call" onclick="userList()">Call Endpoint</button>
+            <div id="user-list-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method GET">GET</span> Get User<span class="endpoint-path">/users/{user_id}</span></h3>
+            <label>User ID (UUID):</label>
+            <input type="text" id="user-get-id" value="550e8400-e29b-41d4-a716-446655440001" placeholder="e.g., 550e8400-e29b-41d4-a716-446655440001">
+            <button class="call" onclick="userGet()">Call Endpoint</button>
+            <div id="user-get-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method POST">POST</span> Create User<span class="endpoint-path">/users</span></h3>
+            <label>JWT Token (required):</label>
+            <input type="text" id="user-create-token" placeholder="Bearer token from /auth/callback">
+            <label>JSON Body:</label>
+            <textarea id="user-create-body">{
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "phone": "+1234567890",
+  "password": "securepassword123",
+  "membership_tier": "FREE"
+}</textarea>
+            <small>Note: Requires JWT token. Get one from /auth/login → /auth/callback</small>
+            <button class="call" onclick="userCreate()">Call Endpoint</button>
+            <div id="user-create-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method PATCH">PATCH</span> Update User<span class="endpoint-path">/users/{user_id}</span></h3>
+            <label>User ID (UUID):</label>
+            <input type="text" id="user-update-id" placeholder="e.g., 550e8400-e29b-41d4-a716-446655440001">
+            <label>JSON Body:</label>
+            <textarea id="user-update-body">{
+  "name": "Updated Name",
+  "email": "updated@example.com",
+  "phone": "+1234567890",
+  "membership_tier": "PREMIUM"
+}</textarea>
+            <button class="call" onclick="userUpdate()">Call Endpoint</button>
+            <div id="user-update-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method DELETE">DELETE</span> Delete User<span class="endpoint-path">/users/{user_id}</span></h3>
+            <label>User ID (UUID):</label>
+            <input type="text" id="user-delete-id" placeholder="e.g., 550e8400-e29b-41d4-a716-446655440001">
+            <label>JWT Token (required):</label>
+            <input type="text" id="user-delete-token" placeholder="Bearer token from /auth/callback">
+            <button class="call" onclick="userDelete()">Call Endpoint</button>
+            <div id="user-delete-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method GET">GET</span> List Profiles<span class="endpoint-path">/profiles</span></h3>
+            <div class="form-row">
+                <div>
+                    <label>Page Size:</label>
+                    <input type="number" id="profile-list-size" value="10" min="1" max="100">
+                </div>
+                <div>
+                    <label>Page Token:</label>
+                    <input type="text" id="profile-list-token" placeholder="Optional">
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>User ID (filter):</label>
+                    <input type="text" id="profile-list-userid" placeholder="Optional UUID">
+                </div>
+                <div>
+                    <label>Username (filter):</label>
+                    <input type="text" id="profile-list-username" placeholder="Optional">
+                </div>
+            </div>
+            <button class="call" onclick="profileList()">Call Endpoint</button>
+            <div id="profile-list-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method GET">GET</span> Get Profile<span class="endpoint-path">/profiles/{profile_id}</span></h3>
+            <label>Profile ID (UUID):</label>
+            <input type="text" id="profile-get-id" placeholder="e.g., 550e8400-e29b-41d4-a716-446655440001">
+            <button class="call" onclick="profileGet()">Call Endpoint</button>
+            <div id="profile-get-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method POST">POST</span> Create Profile<span class="endpoint-path">/profiles</span></h3>
+            <label>JSON Body:</label>
+            <textarea id="profile-create-body">{
+  "user_id": "550e8400-e29b-41d4-a716-446655440001",
+  "username": "johndoe",
+  "bio": "Software developer",
+  "address": "123 Main St, City, State 12345"
+}</textarea>
+            <button class="call" onclick="profileCreate()">Call Endpoint</button>
+            <div id="profile-create-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method PATCH">PATCH</span> Update Profile<span class="endpoint-path">/profiles/{profile_id}</span></h3>
+            <label>Profile ID (UUID):</label>
+            <input type="text" id="profile-update-id" placeholder="e.g., 550e8400-e29b-41d4-a716-446655440001">
+            <label>JSON Body:</label>
+            <textarea id="profile-update-body">{
+  "bio": "Updated bio",
+  "address": "456 New St, City, State 67890"
+}</textarea>
+            <button class="call" onclick="profileUpdate()">Call Endpoint</button>
+            <div id="profile-update-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method DELETE">DELETE</span> Delete Profile<span class="endpoint-path">/profiles/{profile_id}</span></h3>
+            <label>Profile ID (UUID):</label>
+            <input type="text" id="profile-delete-id" placeholder="e.g., 550e8400-e29b-41d4-a716-446655440001">
+            <button class="call" onclick="profileDelete()">Call Endpoint</button>
+            <div id="profile-delete-result" class="result"></div>
+        </div>
+
+        <div class="card">
+            <h3><span class="method GET">GET</span> OAuth2 Login<span class="endpoint-path">/auth/login</span></h3>
+            <small>Redirects to Google OAuth. After login, you'll get a JWT token at /auth/callback</small>
+            <button class="call" onclick="userOAuthLogin()">Start OAuth Login</button>
+            <div id="user-oauth-result" class="result"></div>
+        </div>
     </div>
 
     <!-- CATALOG SERVICE -->
-    <div id="catalog" class="panel active">
+    <div id="catalog" class="panel">
         <div class="card">
             <h3><span class="method GET">GET</span> List Catalog Items<span class="endpoint-path">/catalog/items</span></h3>
             <div class="form-row">
@@ -152,7 +381,7 @@
             <h3><span class="method POST">POST</span> Create Catalog Item<span class="endpoint-path">/catalog/items</span></h3>
             <label>JSON Body:</label>
             <textarea id="cat-create-body">{
-  "sku": "ITEM-" + Date.now(),
+  "sku": "ITEM-AUTO",
   "name": "Luxury Watch",
   "brand": "Rolex",
   "category": "Watches",
@@ -296,10 +525,10 @@
         </div>
     </div>
 
-    <!-- USER SERVICE -->
-    <div id="user" class="panel">
+    <!-- COMPOSITE SERVICE -->
+    <div id="composite" class="panel">
         <div class="card">
-            <h3><span class="method GET">GET</span> List Users<span class="endpoint-path">/users</span></h3>
+            <h3><span class="method GET">GET</span> Health Check<span class="endpoint-path">/readyz</span></h3>
             <div class="form-row">
                 <div>
                     <label>Page Size:</label>
@@ -562,6 +791,679 @@
         </div>
     </div>
 
+    <!-- API DOCUMENTATION -->
+    <div id="api-docs" class="panel">
+        <div class="card">
+            <h3>📚 OpenAPI / Swagger Documentation</h3>
+            <p>Interactive API documentation for all microservices:</p>
+            <div class="form-row">
+                <div>
+                    <label>Select Service:</label>
+                    <select id="api-docs-service" onchange="loadApiDocs()">
+                        <option value="composite">Composite Service</option>
+                        <option value="catalog">Catalog & Inventory Service</option>
+                        <option value="order">Order & Rental Service</option>
+                        <option value="user">User & Profile Service</option>
+                    </select>
+                </div>
+            </div>
+            <div id="api-docs-container">
+                <iframe id="swagger-iframe" src="https://composite-microservice-314897419193.europe-west1.run.app/docs" frameborder="0"></iframe>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📋 API Endpoints Summary - Complete CRUD Operations</h3>
+            <p style="color: #666; font-size: 13px; margin-bottom: 20px;">
+                All endpoints organized by resource and HTTP method. Perfect for screenshots demonstrating GET, POST, PUT/PATCH, DELETE operations.
+            </p>
+            
+            <!-- User & Profile Service -->
+            <div style="background: #e3f2fd; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                <h4 style="margin-top: 0; color: #1976d2;">🔵 Microservice 1: User & Profile Service</h4>
+                
+                <div style="background: white; padding: 15px; border-radius: 6px; margin-top: 10px;">
+                    <h5 style="margin-top: 0; color: #333;">Resource: Users</h5>
+                    <table style="width: 100%; border-collapse: collapse; font-family: monospace; font-size: 13px;">
+                        <tr style="background: #f5f5f5;">
+                            <th style="padding: 8px; text-align: left; width: 80px;">Method</th>
+                            <th style="padding: 8px; text-align: left;">Endpoint</th>
+                            <th style="padding: 8px; text-align: left;">Description</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;"><span class="method GET">GET</span></td>
+                            <td style="padding: 8px;"><code>/users</code></td>
+                            <td style="padding: 8px;">List all users (with pagination & filters)</td>
+                        </tr>
+                        <tr style="background: #fafafa;">
+                            <td style="padding: 8px;"><span class="method GET">GET</span></td>
+                            <td style="padding: 8px;"><code>/users/{user_id}</code></td>
+                            <td style="padding: 8px;">Get a specific user by ID</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;"><span class="method POST">POST</span></td>
+                            <td style="padding: 8px;"><code>/users</code></td>
+                            <td style="padding: 8px;">Create a new user (requires JWT)</td>
+                        </tr>
+                        <tr style="background: #fafafa;">
+                            <td style="padding: 8px;"><span class="method PATCH">PATCH</span></td>
+                            <td style="padding: 8px;"><code>/users/{user_id}</code></td>
+                            <td style="padding: 8px;">Update user (partial update)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;"><span class="method DELETE">DELETE</span></td>
+                            <td style="padding: 8px;"><code>/users/{user_id}</code></td>
+                            <td style="padding: 8px;">Delete a user (requires JWT)</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div style="background: white; padding: 15px; border-radius: 6px; margin-top: 15px;">
+                    <h5 style="margin-top: 0; color: #333;">Resource: Profiles</h5>
+                    <table style="width: 100%; border-collapse: collapse; font-family: monospace; font-size: 13px;">
+                        <tr style="background: #f5f5f5;">
+                            <th style="padding: 8px; text-align: left; width: 80px;">Method</th>
+                            <th style="padding: 8px; text-align: left;">Endpoint</th>
+                            <th style="padding: 8px; text-align: left;">Description</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;"><span class="method GET">GET</span></td>
+                            <td style="padding: 8px;"><code>/profiles</code></td>
+                            <td style="padding: 8px;">List all profiles (with pagination & filters)</td>
+                        </tr>
+                        <tr style="background: #fafafa;">
+                            <td style="padding: 8px;"><span class="method GET">GET</span></td>
+                            <td style="padding: 8px;"><code>/profiles/{profile_id}</code></td>
+                            <td style="padding: 8px;">Get a specific profile by ID</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;"><span class="method POST">POST</span></td>
+                            <td style="padding: 8px;"><code>/profiles</code></td>
+                            <td style="padding: 8px;">Create a new profile</td>
+                        </tr>
+                        <tr style="background: #fafafa;">
+                            <td style="padding: 8px;"><span class="method PATCH">PATCH</span></td>
+                            <td style="padding: 8px;"><code>/profiles/{profile_id}</code></td>
+                            <td style="padding: 8px;">Update profile (partial update)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;"><span class="method DELETE">DELETE</span></td>
+                            <td style="padding: 8px;"><code>/profiles/{profile_id}</code></td>
+                            <td style="padding: 8px;">Delete a profile</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div style="background: white; padding: 15px; border-radius: 6px; margin-top: 15px;">
+                    <h5 style="margin-top: 0; color: #333;">OAuth2/Authentication</h5>
+                    <table style="width: 100%; border-collapse: collapse; font-family: monospace; font-size: 13px;">
+                        <tr style="background: #f5f5f5;">
+                            <th style="padding: 8px; text-align: left; width: 80px;">Method</th>
+                            <th style="padding: 8px; text-align: left;">Endpoint</th>
+                            <th style="padding: 8px; text-align: left;">Description</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;"><span class="method GET">GET</span></td>
+                            <td style="padding: 8px;"><code>/auth/login</code></td>
+                            <td style="padding: 8px;">Initiate OAuth2 login with Google</td>
+                        </tr>
+                        <tr style="background: #fafafa;">
+                            <td style="padding: 8px;"><span class="method GET">GET</span></td>
+                            <td style="padding: 8px;"><code>/auth/callback</code></td>
+                            <td style="padding: 8px;">OAuth2 callback - returns JWT token</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Catalog & Inventory Service -->
+            <div style="background: #e8f5e9; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                <h4 style="margin-top: 0; color: #2e7d32;">🟢 Microservice 2: Catalog & Inventory Service</h4>
+                
+                <div style="background: white; padding: 15px; border-radius: 6px; margin-top: 10px;">
+                    <h5 style="margin-top: 0; color: #333;">Resource: Catalog Items</h5>
+                    <table style="width: 100%; border-collapse: collapse; font-family: monospace; font-size: 13px;">
+                        <tr style="background: #f5f5f5;">
+                            <th style="padding: 8px; text-align: left; width: 80px;">Method</th>
+                            <th style="padding: 8px; text-align: left;">Endpoint</th>
+                            <th style="padding: 8px; text-align: left;">Description</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;"><span class="method GET">GET</span></td>
+                            <td style="padding: 8px;"><code>/catalog/items</code></td>
+                            <td style="padding: 8px;">List all catalog items (with pagination & filters)</td>
+                        </tr>
+                        <tr style="background: #fafafa;">
+                            <td style="padding: 8px;"><span class="method GET">GET</span></td>
+                            <td style="padding: 8px;"><code>/catalog/items/{id}</code></td>
+                            <td style="padding: 8px;">Get a specific catalog item by ID</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;"><span class="method POST">POST</span></td>
+                            <td style="padding: 8px;"><code>/catalog/items</code></td>
+                            <td style="padding: 8px;">Create a new catalog item (triggers Pub/Sub event)</td>
+                        </tr>
+                        <tr style="background: #fafafa;">
+                            <td style="padding: 8px;"><span class="method PUT">PUT</span></td>
+                            <td style="padding: 8px;"><code>/catalog/items/{id}</code></td>
+                            <td style="padding: 8px;">Update catalog item (full update)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;"><span class="method DELETE">DELETE</span></td>
+                            <td style="padding: 8px;"><code>/catalog/items/{id}</code></td>
+                            <td style="padding: 8px;">Delete a catalog item</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Order & Rental Service -->
+            <div style="background: #fff3e0; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                <h4 style="margin-top: 0; color: #e65100;">🟡 Microservice 3: Order & Rental Service</h4>
+                
+                <div style="background: white; padding: 15px; border-radius: 6px; margin-top: 10px;">
+                    <h5 style="margin-top: 0; color: #333;">Resource: Orders</h5>
+                    <table style="width: 100%; border-collapse: collapse; font-family: monospace; font-size: 13px;">
+                        <tr style="background: #f5f5f5;">
+                            <th style="padding: 8px; text-align: left; width: 80px;">Method</th>
+                            <th style="padding: 8px; text-align: left;">Endpoint</th>
+                            <th style="padding: 8px; text-align: left;">Description</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;"><span class="method GET">GET</span></td>
+                            <td style="padding: 8px;"><code>/orders</code></td>
+                            <td style="padding: 8px;">List all orders (with filters: status, userId, itemId, dates)</td>
+                        </tr>
+                        <tr style="background: #fafafa;">
+                            <td style="padding: 8px;"><span class="method GET">GET</span></td>
+                            <td style="padding: 8px;"><code>/orders/{orderId}</code></td>
+                            <td style="padding: 8px;">Get a specific order by ID</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;"><span class="method POST">POST</span></td>
+                            <td style="padding: 8px;"><code>/orders</code></td>
+                            <td style="padding: 8px;">Create a new order</td>
+                        </tr>
+                        <tr style="background: #fafafa;">
+                            <td style="padding: 8px;"><span class="method DELETE">DELETE</span></td>
+                            <td style="padding: 8px;"><code>/orders/{orderId}</code></td>
+                            <td style="padding: 8px;">Cancel an order</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;"><span class="method PATCH">PATCH</span></td>
+                            <td style="padding: 8px;"><code>/orders/{orderId}/status</code></td>
+                            <td style="padding: 8px;">Update order status (pending, active, cancelled, returned)</td>
+                        </tr>
+                        <tr style="background: #fafafa;">
+                            <td style="padding: 8px;"><span class="method GET">GET</span></td>
+                            <td style="padding: 8px;"><code>/orders/{orderId}/logs</code></td>
+                            <td style="padding: 8px;">Get order activity logs</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;"><span class="method POST">POST</span></td>
+                            <td style="padding: 8px;"><code>/orders/{orderId}/confirm</code></td>
+                            <td style="padding: 8px;">Confirm order (returns 202 Accepted with job ID)</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div style="background: white; padding: 15px; border-radius: 6px; margin-top: 15px;">
+                    <h5 style="margin-top: 0; color: #333;">Resource: Jobs (Async Operations)</h5>
+                    <table style="width: 100%; border-collapse: collapse; font-family: monospace; font-size: 13px;">
+                        <tr style="background: #f5f5f5;">
+                            <th style="padding: 8px; text-align: left; width: 80px;">Method</th>
+                            <th style="padding: 8px; text-align: left;">Endpoint</th>
+                            <th style="padding: 8px; text-align: left;">Description</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;"><span class="method GET">GET</span></td>
+                            <td style="padding: 8px;"><code>/jobs/{jobId}</code></td>
+                            <td style="padding: 8px;">Get job status (for async order confirmation)</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Composite Service -->
+            <div style="background: #f3e5f5; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                <h4 style="margin-top: 0; color: #7b1fa2;">🟣 Composite Microservice</h4>
+                <p style="font-size: 12px; color: #666; margin-bottom: 15px;">
+                    The composite service encapsulates atomic services and adds composite-specific behavior (FK validation, parallel execution, merged search).
+                </p>
+                
+                <div style="background: white; padding: 15px; border-radius: 6px; margin-top: 10px;">
+                    <h5 style="margin-top: 0; color: #333;">Proxied Endpoints (Delegation)</h5>
+                    <table style="width: 100%; border-collapse: collapse; font-family: monospace; font-size: 13px;">
+                        <tr style="background: #f5f5f5;">
+                            <th style="padding: 8px; text-align: left; width: 80px;">Method</th>
+                            <th style="padding: 8px; text-align: left;">Endpoint</th>
+                            <th style="padding: 8px; text-align: left;">Description</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;"><span class="method GET">GET</span></td>
+                            <td style="padding: 8px;"><code>/users/{user_id}</code></td>
+                            <td style="padding: 8px;">Get user (delegates to User Service)</td>
+                        </tr>
+                        <tr style="background: #fafafa;">
+                            <td style="padding: 8px;"><span class="method GET">GET</span></td>
+                            <td style="padding: 8px;"><code>/items</code></td>
+                            <td style="padding: 8px;">List items (delegates to Catalog Service)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;"><span class="method GET">GET</span></td>
+                            <td style="padding: 8px;"><code>/items/{item_id}</code></td>
+                            <td style="padding: 8px;">Get item (delegates to Catalog Service)</td>
+                        </tr>
+                        <tr style="background: #fafafa;">
+                            <td style="padding: 8px;"><span class="method GET">GET</span></td>
+                            <td style="padding: 8px;"><code>/orders/{order_id}</code></td>
+                            <td style="padding: 8px;">Get order (delegates to Order Service)</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div style="background: white; padding: 15px; border-radius: 6px; margin-top: 15px;">
+                    <h5 style="margin-top: 0; color: #333;">Composite-Specific Endpoints</h5>
+                    <table style="width: 100%; border-collapse: collapse; font-family: monospace; font-size: 13px;">
+                        <tr style="background: #f5f5f5;">
+                            <th style="padding: 8px; text-align: left; width: 80px;">Method</th>
+                            <th style="padding: 8px; text-align: left;">Endpoint</th>
+                            <th style="padding: 8px; text-align: left;">Description</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;"><span class="method GET">GET</span></td>
+                            <td style="padding: 8px;"><code>/readyz</code></td>
+                            <td style="padding: 8px;">Health check</td>
+                        </tr>
+                        <tr style="background: #fafafa;">
+                            <td style="padding: 8px;"><span class="method POST">POST</span></td>
+                            <td style="padding: 8px;"><code>/orders</code></td>
+                            <td style="padding: 8px;">Create order with <strong>FK validation</strong> and <strong>parallel execution</strong> (threads)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;"><span class="method POST">POST</span></td>
+                            <td style="padding: 8px;"><code>/orders/{order_id}/confirm</code></td>
+                            <td style="padding: 8px;">Confirm order (returns 202 Accepted with job ID)</td>
+                        </tr>
+                        <tr style="background: #fafafa;">
+                            <td style="padding: 8px;"><span class="method GET">GET</span></td>
+                            <td style="padding: 8px;"><code>/jobs/{job_id}</code></td>
+                            <td style="padding: 8px;">Get job status</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;"><span class="method GET">GET</span></td>
+                            <td style="padding: 8px;"><code>/search</code></td>
+                            <td style="padding: 8px;">Multi-source search (aggregates catalog + orders)</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div style="background: #fff9c4; padding: 15px; border-radius: 6px; margin-top: 20px;">
+                <h4 style="margin-top: 0; color: #f57f17;">📊 Summary: CRUD Operations Coverage</h4>
+                <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px;">
+                    <tr style="background: #f5f5f5;">
+                        <th style="padding: 10px; text-align: left;">Service</th>
+                        <th style="padding: 10px; text-align: center;">GET</th>
+                        <th style="padding: 10px; text-align: center;">POST</th>
+                        <th style="padding: 10px; text-align: center;">PUT/PATCH</th>
+                        <th style="padding: 10px; text-align: center;">DELETE</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px;"><strong>Users</strong></td>
+                        <td style="padding: 10px; text-align: center;">✅ List, Get</td>
+                        <td style="padding: 10px; text-align: center;">✅ Create</td>
+                        <td style="padding: 10px; text-align: center;">✅ PATCH</td>
+                        <td style="padding: 10px; text-align: center;">✅ Delete</td>
+                    </tr>
+                    <tr style="background: #fafafa;">
+                        <td style="padding: 10px;"><strong>Profiles</strong></td>
+                        <td style="padding: 10px; text-align: center;">✅ List, Get</td>
+                        <td style="padding: 10px; text-align: center;">✅ Create</td>
+                        <td style="padding: 10px; text-align: center;">✅ PATCH</td>
+                        <td style="padding: 10px; text-align: center;">✅ Delete</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px;"><strong>Catalog Items</strong></td>
+                        <td style="padding: 10px; text-align: center;">✅ List, Get</td>
+                        <td style="padding: 10px; text-align: center;">✅ Create</td>
+                        <td style="padding: 10px; text-align: center;">✅ PUT</td>
+                        <td style="padding: 10px; text-align: center;">✅ Delete</td>
+                    </tr>
+                    <tr style="background: #fafafa;">
+                        <td style="padding: 10px;"><strong>Orders</strong></td>
+                        <td style="padding: 10px; text-align: center;">✅ List, Get, Logs</td>
+                        <td style="padding: 10px; text-align: center;">✅ Create, Confirm</td>
+                        <td style="padding: 10px; text-align: center;">✅ PATCH Status</td>
+                        <td style="padding: 10px; text-align: center;">✅ Cancel</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- GCP DEPLOYMENT INFO -->
+    <div id="deployment" class="panel">
+        <div class="card">
+            <h3>☁️ Google Cloud Platform Deployment Information</h3>
+            
+            <div class="deployment-info">
+                <h4>Composite Service</h4>
+                <p><strong>Service URL:</strong> <code>https://composite-microservice-314897419193.europe-west1.run.app</code></p>
+                <p><strong>Region:</strong> <code>europe-west1</code></p>
+                <p><strong>Platform:</strong> <code>Cloud Run</code></p>
+                <p><strong>Status:</strong> <span id="composite-status">Checking...</span></p>
+            </div>
+
+            <div class="deployment-info">
+                <h4>Catalog & Inventory Service</h4>
+                <p><strong>Service URL:</strong> <code>https://catalog-and-inventory-service-314897419193.europe-west1.run.app</code></p>
+                <p><strong>Region:</strong> <code>europe-west1</code></p>
+                <p><strong>Platform:</strong> <code>Cloud Run</code></p>
+                <p><strong>Status:</strong> <span id="catalog-status">Checking...</span></p>
+            </div>
+
+            <div class="deployment-info">
+                <h4>Order & Rental Service</h4>
+                <p><strong>Service URL:</strong> <code>https://order-and-rental-service-314897419193.europe-west1.run.app</code></p>
+                <p><strong>Region:</strong> <code>europe-west1</code></p>
+                <p><strong>Platform:</strong> <code>Cloud Run</code></p>
+                <p><strong>Status:</strong> <span id="order-status">Checking...</span></p>
+            </div>
+
+            <div class="deployment-info">
+                <h4>User & Profile Service</h4>
+                <p><strong>Service URL:</strong> <code>https://34.13.123.175</code></p>
+                <p><strong>Platform:</strong> <code>Compute Engine (Load Balancer)</code></p>
+                <p><strong>Status:</strong> <span id="user-status">Checking...</span></p>
+            </div>
+
+            <div class="deployment-info">
+                <h4>Project Information</h4>
+                <p><strong>Project ID:</strong> <code>upheld-booking-475003-p1</code></p>
+                <p><strong>Database:</strong> <code>Cloud SQL (MySQL)</code></p>
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                    <li><code>luxury-rental-db</code> - User & Profile database</li>
+                    <li><code>luxury-rental-db-catalog</code> - Catalog database</li>
+                    <li><code>luxury-rental-db-orders</code> - Order database</li>
+                </ul>
+            </div>
+
+            <button class="call" onclick="checkDeploymentStatus()" style="margin-top: 15px;">Refresh Deployment Status</button>
+        </div>
+
+        <div class="card">
+            <h3>📸 Screenshots & Documentation</h3>
+            <p>Upload or link screenshots for each microservice demonstration:</p>
+            
+            <div class="screenshot-placeholder" id="screenshot-placeholder">
+                <p>📷 Screenshot Display Area</p>
+                <p style="font-size: 12px; margin-top: 10px;">To add screenshots:</p>
+                <ol style="text-align: left; display: inline-block; font-size: 12px;">
+                    <li>Upload images to a public location (GCS, GitHub, etc.)</li>
+                    <li>Add image URLs below</li>
+                    <li>Screenshots will be displayed here</li>
+                </ol>
+            </div>
+
+            <div style="margin-top: 15px;">
+                <label>Screenshot URL:</label>
+                <input type="text" id="screenshot-url" placeholder="https://example.com/screenshot.png">
+                <label>Caption:</label>
+                <input type="text" id="screenshot-caption" placeholder="Description of screenshot">
+                <button class="call" onclick="addScreenshot()" style="margin-top: 10px;">Add Screenshot</button>
+            </div>
+
+            <div id="screenshots-container" style="margin-top: 20px;"></div>
+        </div>
+    </div>
+
+    <!-- DEMONSTRATION SCREENSHOTS -->
+    <div id="screenshots" class="panel">
+        <div class="card">
+            <h3>📸 Project Demonstration Screenshots</h3>
+            <p>Organize screenshots by requirement category. Add screenshots for each demonstration item.</p>
+        </div>
+
+        <!-- Microservice 1: User & Profile -->
+        <div class="card">
+            <h3>🔵 Microservice 1: User & Profile Service</h3>
+            <div class="requirement-section">
+                <h4>1. Paths for each resource (GET, PUT/PATCH, POST, DELETE)</h4>
+                <div id="ms1-paths" class="screenshot-section"></div>
+                <button class="call" onclick="addScreenshotToSection('ms1-paths', 'User & Profile - API Paths')" style="margin-top: 10px; width: auto; padding: 8px 16px;">+ Add Screenshot</button>
+            </div>
+            <div class="requirement-section" style="margin-top: 20px;">
+                <h4>2. API Definition (OpenAPI or Swagger)</h4>
+                <div id="ms1-api" class="screenshot-section"></div>
+                <button class="call" onclick="addScreenshotToSection('ms1-api', 'User & Profile - OpenAPI/Swagger')" style="margin-top: 10px; width: auto; padding: 8px 16px;">+ Add Screenshot</button>
+            </div>
+            <div class="requirement-section" style="margin-top: 20px;">
+                <h4>3. GCP Deployment</h4>
+                <div id="ms1-deployment" class="screenshot-section"></div>
+                <button class="call" onclick="addScreenshotToSection('ms1-deployment', 'User & Profile - GCP Deployment')" style="margin-top: 10px; width: auto; padding: 8px 16px;">+ Add Screenshot</button>
+            </div>
+            <div class="requirement-section" style="margin-top: 20px;">
+                <h4>4. Demonstrated Items</h4>
+                <div id="ms1-demo" class="screenshot-section"></div>
+                <button class="call" onclick="addScreenshotToSection('ms1-demo', 'User & Profile - Demo Items')" style="margin-top: 10px; width: auto; padding: 8px 16px;">+ Add Screenshot</button>
+            </div>
+        </div>
+
+        <!-- Microservice 2: Catalog & Inventory -->
+        <div class="card">
+            <h3>🟢 Microservice 2: Catalog & Inventory Service</h3>
+            <div class="requirement-section">
+                <h4>1. Paths for each resource (GET, PUT/PATCH, POST, DELETE)</h4>
+                <div id="ms2-paths" class="screenshot-section"></div>
+                <button class="call" onclick="addScreenshotToSection('ms2-paths', 'Catalog & Inventory - API Paths')" style="margin-top: 10px; width: auto; padding: 8px 16px;">+ Add Screenshot</button>
+            </div>
+            <div class="requirement-section" style="margin-top: 20px;">
+                <h4>2. API Definition (OpenAPI or Swagger)</h4>
+                <div id="ms2-api" class="screenshot-section"></div>
+                <button class="call" onclick="addScreenshotToSection('ms2-api', 'Catalog & Inventory - OpenAPI/Swagger')" style="margin-top: 10px; width: auto; padding: 8px 16px;">+ Add Screenshot</button>
+            </div>
+            <div class="requirement-section" style="margin-top: 20px;">
+                <h4>3. GCP Deployment</h4>
+                <div id="ms2-deployment" class="screenshot-section"></div>
+                <button class="call" onclick="addScreenshotToSection('ms2-deployment', 'Catalog & Inventory - GCP Deployment')" style="margin-top: 10px; width: auto; padding: 8px 16px;">+ Add Screenshot</button>
+            </div>
+            <div class="requirement-section" style="margin-top: 20px;">
+                <h4>4. Demonstrated Items</h4>
+                <div id="ms2-demo" class="screenshot-section"></div>
+                <button class="call" onclick="addScreenshotToSection('ms2-demo', 'Catalog & Inventory - Demo Items')" style="margin-top: 10px; width: auto; padding: 8px 16px;">+ Add Screenshot</button>
+            </div>
+        </div>
+
+        <!-- Microservice 3: Order & Rental -->
+        <div class="card">
+            <h3>🟡 Microservice 3: Order & Rental Service</h3>
+            <div class="requirement-section">
+                <h4>1. Paths for each resource (GET, PUT/PATCH, POST, DELETE)</h4>
+                <div id="ms3-paths" class="screenshot-section"></div>
+                <button class="call" onclick="addScreenshotToSection('ms3-paths', 'Order & Rental - API Paths')" style="margin-top: 10px; width: auto; padding: 8px 16px;">+ Add Screenshot</button>
+            </div>
+            <div class="requirement-section" style="margin-top: 20px;">
+                <h4>2. API Definition (OpenAPI or Swagger)</h4>
+                <div id="ms3-api" class="screenshot-section"></div>
+                <button class="call" onclick="addScreenshotToSection('ms3-api', 'Order & Rental - OpenAPI/Swagger')" style="margin-top: 10px; width: auto; padding: 8px 16px;">+ Add Screenshot</button>
+            </div>
+            <div class="requirement-section" style="margin-top: 20px;">
+                <h4>3. GCP Deployment</h4>
+                <div id="ms3-deployment" class="screenshot-section"></div>
+                <button class="call" onclick="addScreenshotToSection('ms3-deployment', 'Order & Rental - GCP Deployment')" style="margin-top: 10px; width: auto; padding: 8px 16px;">+ Add Screenshot</button>
+            </div>
+            <div class="requirement-section" style="margin-top: 20px;">
+                <h4>4. Demonstrated Items</h4>
+                <div id="ms3-demo" class="screenshot-section"></div>
+                <button class="call" onclick="addScreenshotToSection('ms3-demo', 'Order & Rental - Demo Items')" style="margin-top: 10px; width: auto; padding: 8px 16px;">+ Add Screenshot</button>
+            </div>
+        </div>
+
+        <!-- Composite Microservice -->
+        <div class="card">
+            <h3>🟣 Composite Microservice</h3>
+            <div class="requirement-section">
+                <h4>1. Code/API that implements atomic microservice APIs and delegates</h4>
+                <div id="comp-delegation" class="screenshot-section"></div>
+                <button class="call" onclick="addScreenshotToSection('comp-delegation', 'Composite - API Delegation Code')" style="margin-top: 10px; width: auto; padding: 8px 16px;">+ Add Screenshot</button>
+                <p style="font-size: 12px; color: #666; margin-top: 5px;">
+                    📝 <strong>Code Location:</strong> <code>routers/users.py</code>, <code>routers/items.py</code>, <code>routers/orders.py</code>
+                </p>
+            </div>
+            <div class="requirement-section" style="margin-top: 20px;">
+                <h4>2. Method implementation using threads for parallel execution</h4>
+                <div id="comp-threads" class="screenshot-section"></div>
+                <button class="call" onclick="addScreenshotToSection('comp-threads', 'Composite - Thread Implementation')" style="margin-top: 10px; width: auto; padding: 8px 16px;">+ Add Screenshot</button>
+                <p style="font-size: 12px; color: #666; margin-top: 5px;">
+                    📝 <strong>Code Location:</strong> <code>routers/orders.py</code> - <code>_fetch_in_thread()</code> and <code>asyncio.gather()</code>
+                </p>
+            </div>
+            <div class="requirement-section" style="margin-top: 20px;">
+                <h4>3. Logical foreign key constraints implementation</h4>
+                <div id="comp-fk" class="screenshot-section"></div>
+                <button class="call" onclick="addScreenshotToSection('comp-fk', 'Composite - FK Constraints')" style="margin-top: 10px; width: auto; padding: 8px 16px;">+ Add Screenshot</button>
+                <p style="font-size: 12px; color: #666; margin-top: 5px;">
+                    📝 <strong>Code Location:</strong> <code>routers/orders.py</code> - <code>POST /orders</code> validates user and item existence
+                </p>
+            </div>
+        </div>
+
+        <!-- Database -->
+        <div class="card">
+            <h3>💾 Database</h3>
+            <div class="requirement-section">
+                <h4>1. VM with MySQL accessed by one microservice</h4>
+                <div id="db-vm" class="screenshot-section"></div>
+                <button class="call" onclick="addScreenshotToSection('db-vm', 'Database - VM MySQL')" style="margin-top: 10px; width: auto; padding: 8px 16px;">+ Add Screenshot</button>
+            </div>
+            <div class="requirement-section" style="margin-top: 20px;">
+                <h4>2. Cloud SQL database accessed by one microservice</h4>
+                <div id="db-cloudsql" class="screenshot-section"></div>
+                <button class="call" onclick="addScreenshotToSection('db-cloudsql', 'Database - Cloud SQL')" style="margin-top: 10px; width: auto; padding: 8px 16px;">+ Add Screenshot</button>
+                <p style="font-size: 12px; color: #666; margin-top: 5px;">
+                    📝 <strong>Cloud SQL Instances:</strong> <code>luxury-rental-db</code>, <code>luxury-rental-db-catalog</code>, <code>luxury-rental-db-orders</code>
+                </p>
+            </div>
+        </div>
+
+        <!-- Browser Application -->
+        <div class="card">
+            <h3>🌐 Browser Application</h3>
+            <div class="requirement-section">
+                <h4>1. Basic browser-web UI that interacts with atomic and composite microservices</h4>
+                <div id="browser-ui" class="screenshot-section"></div>
+                <button class="call" onclick="addScreenshotToSection('browser-ui', 'Browser - Web UI')" style="margin-top: 10px; width: auto; padding: 8px 16px;">+ Add Screenshot</button>
+                <p style="font-size: 12px; color: #666; margin-top: 5px;">
+                    📝 <strong>Current UI:</strong> <a href="https://storage.googleapis.com/luxury-rent-platform-ui/index.html" target="_blank">https://storage.googleapis.com/luxury-rent-platform-ui/index.html</a>
+                </p>
+            </div>
+            <div class="requirement-section" style="margin-top: 20px;">
+                <h4>2. Deployment through Cloud Storage</h4>
+                <div id="browser-deploy" class="screenshot-section"></div>
+                <button class="call" onclick="addScreenshotToSection('browser-deploy', 'Browser - Cloud Storage Deployment')" style="margin-top: 10px; width: auto; padding: 8px 16px;">+ Add Screenshot</button>
+                <p style="font-size: 12px; color: #666; margin-top: 5px;">
+                    📝 <strong>Bucket:</strong> <code>gs://luxury-rent-platform-ui</code>
+                </p>
+            </div>
+        </div>
+
+        <!-- OAuth2/OIDC Login -->
+        <div class="card">
+            <h3>🔐 OAuth2/OIDC Login</h3>
+            <div class="requirement-section">
+                <h4>1. OAuth2/OIDC login using Google (or another provider)</h4>
+                <div id="oauth-login" class="screenshot-section"></div>
+                <button class="call" onclick="addScreenshotToSection('oauth-login', 'OAuth2 - Google Login Flow')" style="margin-top: 10px; width: auto; padding: 8px 16px;">+ Add Screenshot</button>
+                <p style="font-size: 12px; color: #666; margin-top: 5px;">
+                    📝 <strong>Endpoints:</strong> <code>/auth/login</code> → <code>/auth/callback</code> (User Service)
+                </p>
+            </div>
+            <div class="requirement-section" style="margin-top: 20px;">
+                <h4>2. JWT token generation and validation on microservice methods</h4>
+                <div id="oauth-jwt" class="screenshot-section"></div>
+                <button class="call" onclick="addScreenshotToSection('oauth-jwt', 'OAuth2 - JWT Token Validation')" style="margin-top: 10px; width: auto; padding: 8px 16px;">+ Add Screenshot</button>
+                <p style="font-size: 12px; color: #666; margin-top: 5px;">
+                    📝 <strong>Protected Endpoints:</strong> <code>POST /users</code>, <code>DELETE /users/{id}</code> (User Service)
+                </p>
+            </div>
+        </div>
+
+        <!-- Google Cloud Function -->
+        <div class="card">
+            <h3>⚡ Google Cloud Function</h3>
+            <div class="requirement-section">
+                <h4>1. Implementation/deployment of one Google Cloud Function</h4>
+                <div id="gcf-implementation" class="screenshot-section"></div>
+                <button class="call" onclick="addScreenshotToSection('gcf-implementation', 'Cloud Function - Implementation/Deployment')" style="margin-top: 10px; width: auto; padding: 8px 16px;">+ Add Screenshot</button>
+                <p style="font-size: 12px; color: #666; margin-top: 5px;">
+                    📝 <strong>Function:</strong> <code>handle_catalog_event</code> (Catalog Service)
+                </p>
+            </div>
+            <div class="requirement-section" style="margin-top: 20px;">
+                <h4>2. Triggering by microservice emitting event on topic</h4>
+                <div id="gcf-trigger" class="screenshot-section"></div>
+                <button class="call" onclick="addScreenshotToSection('gcf-trigger', 'Cloud Function - Event Trigger')" style="margin-top: 10px; width: auto; padding: 8px 16px;">+ Add Screenshot</button>
+                <p style="font-size: 12px; color: #666; margin-top: 5px;">
+                    📝 <strong>Flow:</strong> <code>POST /catalog/items</code> → Pub/Sub topic <code>catalog-events</code> → Cloud Function
+                </p>
+            </div>
+        </div>
+
+        <!-- Screenshot Upload Form -->
+        <div class="card" style="margin-top: 30px; background: #f8f9fa;">
+            <h3>📤 Add Screenshot</h3>
+            <label>Screenshot URL:</label>
+            <input type="text" id="screenshot-url-input" placeholder="https://example.com/screenshot.png">
+            <label>Caption/Description:</label>
+            <input type="text" id="screenshot-caption-input" placeholder="Description of screenshot">
+            <label>Target Section:</label>
+            <select id="screenshot-section-select">
+                <option value="">Select section...</option>
+                <optgroup label="Microservice 1: User & Profile">
+                    <option value="ms1-paths">API Paths (GET, PUT/PATCH, POST, DELETE)</option>
+                    <option value="ms1-api">OpenAPI/Swagger Definition</option>
+                    <option value="ms1-deployment">GCP Deployment</option>
+                    <option value="ms1-demo">Demonstrated Items</option>
+                </optgroup>
+                <optgroup label="Microservice 2: Catalog & Inventory">
+                    <option value="ms2-paths">API Paths (GET, PUT/PATCH, POST, DELETE)</option>
+                    <option value="ms2-api">OpenAPI/Swagger Definition</option>
+                    <option value="ms2-deployment">GCP Deployment</option>
+                    <option value="ms2-demo">Demonstrated Items</option>
+                </optgroup>
+                <optgroup label="Microservice 3: Order & Rental">
+                    <option value="ms3-paths">API Paths (GET, PUT/PATCH, POST, DELETE)</option>
+                    <option value="ms3-api">OpenAPI/Swagger Definition</option>
+                    <option value="ms3-deployment">GCP Deployment</option>
+                    <option value="ms3-demo">Demonstrated Items</option>
+                </optgroup>
+                <optgroup label="Composite Microservice">
+                    <option value="comp-delegation">API Delegation Code</option>
+                    <option value="comp-threads">Thread Implementation</option>
+                    <option value="comp-fk">FK Constraints</option>
+                </optgroup>
+                <optgroup label="Database">
+                    <option value="db-vm">VM MySQL</option>
+                    <option value="db-cloudsql">Cloud SQL</option>
+                </optgroup>
+                <optgroup label="Browser Application">
+                    <option value="browser-ui">Web UI</option>
+                    <option value="browser-deploy">Cloud Storage Deployment</option>
+                </optgroup>
+                <optgroup label="OAuth2/OIDC">
+                    <option value="oauth-login">Google Login Flow</option>
+                    <option value="oauth-jwt">JWT Token Validation</option>
+                </optgroup>
+                <optgroup label="Google Cloud Function">
+                    <option value="gcf-implementation">Implementation/Deployment</option>
+                    <option value="gcf-trigger">Event Trigger</option>
+                </optgroup>
+            </select>
+            <button class="call" onclick="addScreenshotFromForm()" style="margin-top: 15px;">Add Screenshot to Selected Section</button>
+        </div>
+    </div>
+
     <script>
         // Service URLs
         const CATALOG_URL = "https://catalog-and-inventory-service-314897419193.europe-west1.run.app";
@@ -676,9 +1578,9 @@
             const body = document.getElementById('cat-create-body').value;
             try {
                 const parsed = JSON.parse(body);
-                // Replace Date.now() placeholder if present
-                if (parsed.sku && parsed.sku.includes('Date.now()')) {
-                    parsed.sku = parsed.sku.replace('Date.now()', Date.now());
+                // Auto-generate unique SKU if placeholder is present
+                if (parsed.sku && (parsed.sku === 'ITEM-AUTO' || parsed.sku.includes('ITEM-AUTO'))) {
+                    parsed.sku = 'ITEM-' + Date.now();
                 }
                 apiCall(`${CATALOG_URL}/catalog/items`, 'POST', JSON.stringify(parsed), 'cat-create-result');
             } catch (e) {
@@ -1042,6 +1944,126 @@
             document.getElementById('user-oauth-result').textContent = 'OAuth login opened in new window. After login, you will be redirected to /auth/callback where you can get your JWT token.';
             document.getElementById('user-oauth-result').className = 'result success';
         }
+
+        // API Documentation functions
+        function loadApiDocs() {
+            const service = document.getElementById('api-docs-service').value;
+            const iframe = document.getElementById('swagger-iframe');
+            const serviceUrls = {
+                'composite': 'https://composite-microservice-314897419193.europe-west1.run.app/docs',
+                'catalog': 'https://catalog-and-inventory-service-314897419193.europe-west1.run.app/docs',
+                'order': 'https://order-and-rental-service-314897419193.europe-west1.run.app/docs',
+                'user': `${USER_URL}/docs`
+            };
+            iframe.src = serviceUrls[service] || serviceUrls['composite'];
+        }
+
+        // Deployment status functions
+        async function checkDeploymentStatus() {
+            const services = [
+                { id: 'composite-status', url: COMPOSITE_URL + '/readyz', name: 'Composite' },
+                { id: 'catalog-status', url: CATALOG_URL + '/', name: 'Catalog' },
+                { id: 'order-status', url: ORDER_URL + '/', name: 'Order' },
+                { id: 'user-status', url: USER_URL + '/users?pageSize=1', name: 'User' }
+            ];
+
+            for (const service of services) {
+                const statusEl = document.getElementById(service.id);
+                statusEl.textContent = 'Checking...';
+                try {
+                    const response = await fetch(service.url, { method: 'GET', mode: 'cors' });
+                    if (response.ok || response.status === 200) {
+                        statusEl.textContent = '✅ Online';
+                        statusEl.style.color = '#2e7d32';
+                    } else {
+                        statusEl.textContent = `⚠️ Status ${response.status}`;
+                        statusEl.style.color = '#f57c00';
+                    }
+                } catch (error) {
+                    statusEl.textContent = '❌ Offline';
+                    statusEl.style.color = '#c62828';
+                }
+            }
+        }
+
+        // Screenshot functions
+        function addScreenshot() {
+            const url = document.getElementById('screenshot-url').value;
+            const caption = document.getElementById('screenshot-caption').value;
+            
+            if (!url) {
+                alert('Please enter a screenshot URL');
+                return;
+            }
+
+            const container = document.getElementById('screenshots-container');
+            const screenshotDiv = document.createElement('div');
+            screenshotDiv.className = 'card';
+            screenshotDiv.style.marginTop = '15px';
+            screenshotDiv.innerHTML = `
+                <img src="${url}" alt="${caption || 'Screenshot'}" style="max-width: 100%; border-radius: 6px; margin-bottom: 10px;" onerror="this.parentElement.innerHTML='<p style=\\'color:red\\'>Failed to load image: ${url}</p>'">
+                ${caption ? `<p style="font-size: 12px; color: #666; margin: 0;">${caption}</p>` : ''}
+                <button onclick="this.parentElement.remove()" style="margin-top: 10px; padding: 5px 10px; background: #f93e3e; color: white; border: none; border-radius: 4px; cursor: pointer;">Remove</button>
+            `;
+            container.appendChild(screenshotDiv);
+
+            // Clear inputs
+            document.getElementById('screenshot-url').value = '';
+            document.getElementById('screenshot-caption').value = '';
+        }
+
+        function addScreenshotToSection(sectionId, defaultCaption) {
+            const url = prompt('Enter screenshot URL:');
+            if (!url) return;
+            
+            const caption = prompt('Enter caption/description:', defaultCaption) || defaultCaption;
+            addScreenshotToSectionInternal(sectionId, url, caption);
+        }
+
+        function addScreenshotFromForm() {
+            const url = document.getElementById('screenshot-url-input').value;
+            const caption = document.getElementById('screenshot-caption-input').value;
+            const sectionId = document.getElementById('screenshot-section-select').value;
+            
+            if (!url) {
+                alert('Please enter a screenshot URL');
+                return;
+            }
+            
+            if (!sectionId) {
+                alert('Please select a target section');
+                return;
+            }
+            
+            addScreenshotToSectionInternal(sectionId, url, caption || 'Screenshot');
+            
+            // Clear form
+            document.getElementById('screenshot-url-input').value = '';
+            document.getElementById('screenshot-caption-input').value = '';
+            document.getElementById('screenshot-section-select').value = '';
+        }
+
+        function addScreenshotToSectionInternal(sectionId, url, caption) {
+            const container = document.getElementById(sectionId);
+            if (!container) {
+                alert('Section not found: ' + sectionId);
+                return;
+            }
+            
+            const screenshotDiv = document.createElement('div');
+            screenshotDiv.className = 'screenshot-item';
+            screenshotDiv.innerHTML = `
+                <img src="${url}" alt="${caption}" style="max-width: 100%; border-radius: 6px; display: block; margin-bottom: 10px;" onerror="this.innerHTML='<p style=\\'color:red;padding:10px\\'>Failed to load image: ${url}</p>'">
+                <p><strong>${caption}</strong></p>
+                <button onclick="this.parentElement.remove()">Remove</button>
+            `;
+            container.appendChild(screenshotDiv);
+        }
+
+        // Check deployment status on page load
+        window.addEventListener('load', function() {
+            checkDeploymentStatus();
+        });
 
         // Helper function for API calls with JWT authentication
         async function apiCallWithAuth(url, method, body, resultId, token, params = null) {
